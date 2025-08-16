@@ -22,3 +22,6 @@ The EntryPoint attribute at line 4 does not work under git bash
 
 Ok, can you make this where it's also callable from an external function, so that it runs either from the command line or inside a larger monolith
 
+Could you make the tab delimiter a hard-coded variable set at the top and add a pure function at the bottom that does the reverse, that is, taks a jagged string array and sends it to stdout? Also, will this code take piped code? Ideally I'd rather pipe things in and out of this rather than pass a file name
+
+
