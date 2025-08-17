@@ -24,4 +24,62 @@ Ok, can you make this where it's also callable from an external function, so tha
 
 Could you make the tab delimiter a hard-coded variable set at the top and add a pure function at the bottom that does the reverse, that is, taks a jagged string array and sends it to stdout? Also, will this code take piped code? Ideally I'd rather pipe things in and out of this rather than pass a file name
 
+ARCHITECTURE IS A MESS - RESET
+
+I would like an F# script, executable from either the windows or bash command line, that accepts piped text input from stdin and outputs piped text to stdout unless given an option for an input filename or an output filename, in which case it uses that. I would ike this script to never fail, instead writing whatever error occurred to the sterror pipe. It should only be pure functions. A seoncd F# script should be the test for this one. It should be constructed similarly and call the first one. The text file each script should work on is tab-delimited  and coulds contain any number of lines of text, so streams should be used instead of complete data loads. Finally, each of these scripts should be written in a pure functional manner and the function that does the data processing should be separate from the main function that is called from the outside world, allowing it to be used in other programs wihtout the corresponding framework code.
+
+```grok
+(Thought for 2min 5sec)
+
+  Analyzing script requirements
+
+  The script needs to handle piped text input from stdin and output to stdout.
+
+  It should accept options for input/output filenames if provided.
+
+  Processing tab-delimited text is mentioned, but no specific operation is detailed.
+
+  Both scripts must be pure functional, with processing separate from the main function for reusability.
+
+  The main script will use System.Environment.GetCommandLineArgs() for argument parsing to keep it simple and pure.
+
+  Planning stream handling
+
+  Streams will read lines lazily using TextReader for input.
+
+  Let's consider using fsi.CommandLineArgs for parsing script arguments in F# interactive.
+
+  On input file errors, the script writes to stderr and falls back to stdin.
+
+  For file input, the script must dispose resources properly.
+
+  Output handling mirrors input, using TextWriter for stdout or files, with similar error fallback.
+
+  Designing test script
+
+  The test script calls the main script using System.Diagnostics.Process.
+
+  It needs to test tab-delimited processing, possibly by checking field reversal.
+
+  The test should create a temp input file with tab-delimited lines to verify processing.
+
+  The test script's processing logic should be pure and return test messages as a sequence.
+
+  Temp files can be created using Path.GetTempFileName() in F# for testing purposes.
+
+  Running the process involves IO, which isn't pure, but the user likely means the processing part is pure.
+
+  Implementing test execution
+
+  The test script can use ProcessStartInfo to run the main script with arguments.
+
+  Tests include piping input and checking output, expecting reversed tab-delimited fields.
+
+```
+
+(putting this into part2.fsx)
+
+
+
+
 
