@@ -1,0 +1,1 @@
+type test.txt | dotnet fsi part2-test.fsx

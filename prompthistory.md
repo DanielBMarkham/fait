@@ -116,3 +116,12 @@ Let's call these two scripts part2.fsx and part2-test.fsx The first script seems
 
 (seems to work the same under bash. no compiler warnings now, but stil no output under dos)
 
+
+
+I'm still smoke testing the first one. This seems to work the same under bash. no compiler warnings now, but still no output under dos, Can't dos use pipes to both input and output data from the console?
+
+Thought for one minute 36 seconds
+
+On Windows Command Prompt (DOS), yes, you can absolutely use pipes for input and output with the script—just like in bash. The issue is that Windows doesn't natively recognize the shebang line (#!/usr/bin/env -S dotnet fsi) to make the .fsx file directly executable. Instead, you need to explicitly invoke the F# interactive runtime with dotnet fsi as a prefix.To pipe input from a file and get output to the console, use this command (replacing cat with the native type equivalent):
+
+I like that. I made that file. Running both scripts, part2.fsx and part2-test.fsx, seems to work under default conditions. I also made a part2-test.cmd dos file so that both scripts are used the same. 
