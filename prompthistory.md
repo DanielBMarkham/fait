@@ -141,3 +141,47 @@ The test script should call the processor and capture its output and errors.
 
 I went back and started smoke testing the main file, test2-fsx from bash. Maybe I wasn't clear. Both of these scripts should be pipe-able to the other one, ie, when I run cat test.txt | ./part2.fsx | ./part2-test.fsx since there are no test definitions in the incoming file, it should just accept the incoming text without failure and run the hard-coded tests, perhaps warning the user that there was nothing to process. It should work the other way, ie be bidirectional. I should be able to run ./part2-test.fsx | part2.fsx and it should just accept the jagged array and kick it back out, as always.
 
+(think think think code)
+Thought for 2m 24s
+
+
+Analyzing script behavior
+
+Both scripts, test2-fsx and part2-test.fsx, should handle piped input bidirectionally.
+
+Part2.fsx processes tab-delimited text by reversing columns.
+
+Part2-test.fsx outputs test results to stdout and isn't designed for stdin input.
+
+The issue is making part2-test.fsx accept piped input without using it, perhaps with a warning.
+
+To "accept without failure," part2-test.fsx should consume stdin but ignore it, warning the user.
+
+Improving test output
+
+Part2-test.fsx's output lacks tabs, so reversing columns does nothing in part2.fsx.
+
+When piped non-test data, part2-test.fsx should warn and run hard-coded tests.
+
+If piped input has an invalid format, part2-test.fsx will warn and fall back to hard-coded tests.
+
+Let's consider modifying runProcessor to handle file output with -o flag.
+
+For tests with -o, runProcessor needs to read output from the file instead of stdout.
+
+Handling file operations
+
+For tests with -i and -o flags, create temporary input files before running processes.
+
+If Input is None and -i is used, the input file must exist for hard-coded tests like "Input output files."
+
+Adding an InputContent field to TestCase could help manage file content for tests.
+
+Let's adjust getHardCodedTests to include tests with temporary files.
+
+Temporary files for -i and -o need creation and cleanup in the test loop.
+
+Updating test case structure
+
+TestCase needs an InputContent field as a string option for file input management.
+

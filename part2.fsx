@@ -14,6 +14,7 @@ let processLines (lines: seq<string>) : seq<string> =
 type Options = {
     Input: string option
     Output: string option
+    Help: bool
 }
 
 let parseOptions (args: string[]) : Options =
@@ -22,8 +23,9 @@ let parseOptions (args: string[]) : Options =
         | [] -> acc
         | "-i" :: f :: tail -> parse { acc with Input = Some f } tail
         | "-o" :: f :: tail -> parse { acc with Output = Some f } tail
+        | ("-h" | "--help") :: _ -> { acc with Help = true }
         | _ :: tail -> parse acc tail
-    parse { Input = None; Output = None } (Array.toList args)
+    parse { Input = None; Output = None; Help = false } (Array.toList args)
 
 let readLines (reader: TextReader) : seq<string> =
     seq {
@@ -45,40 +47,58 @@ let getScriptArgs () =
     else
         [||]
 
+let showHelp () =
+    Console.WriteLine "part2.fsx: A script to process tab-delimited text by reversing the order of columns in each line."
+    Console.WriteLine ""
+    Console.WriteLine "Usage: dotnet fsi part2.fsx [options]"
+    Console.WriteLine ""
+    Console.WriteLine "Options:"
+    Console.WriteLine "  -i <file>    Input file (default: stdin)"
+    Console.WriteLine "  -o <file>    Output file (default: stdout)"
+    Console.WriteLine "  -h, --help   Show this help message"
+    Console.WriteLine ""
+    Console.WriteLine "Examples:"
+    Console.WriteLine "  echo \"a\tb\tc\" | dotnet fsi part2.fsx                # Outputs: c\tb\ta"
+    Console.WriteLine "  dotnet fsi part2.fsx -i input.txt -o output.txt      # Processes input.txt to output.txt"
+    Console.WriteLine "  type input.txt | dotnet fsi part2.fsx > output.txt   # Windows pipe example"
+
 let main () =
     try
         let opts = parseOptions (getScriptArgs ())
 
-        let input, inputDispose =
-            match opts.Input with
-            | None -> Console.In, (fun () -> ())
-            | Some f ->
-                try
-                    let r = File.OpenText f
-                    r, r.Dispose
-                with e ->
-                    Console.Error.WriteLine $"Error opening input file '{f}': {e.Message}"
-                    Console.In, (fun () -> ())
+        if opts.Help then
+            showHelp ()
+        else
+            let input, inputDispose =
+                match opts.Input with
+                | None -> Console.In, (fun () -> ())
+                | Some f ->
+                    try
+                        let r = File.OpenText f
+                        r, r.Dispose
+                    with e ->
+                        Console.Error.WriteLine $"Error opening input file '{f}': {e.Message}"
+                        Console.In, (fun () -> ())
 
-        use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
+            use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
 
-        let output, outputDispose =
-            match opts.Output with
-            | None -> Console.Out, (fun () -> ())
-            | Some f ->
-                try
-                    let w = File.CreateText f
-                    w, w.Dispose
-                with e ->
-                    Console.Error.WriteLine $"Error opening output file '{f}': {e.Message}"
-                    Console.Out, (fun () -> ())
+            let output, outputDispose =
+                match opts.Output with
+                | None -> Console.Out, (fun () -> ())
+                | Some f ->
+                    try
+                        let w = File.CreateText f
+                        w, w.Dispose
+                    with e ->
+                        Console.Error.WriteLine $"Error opening output file '{f}': {e.Message}"
+                        Console.Out, (fun () -> ())
 
-        use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
+            use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
 
-        let lines = readLines input
-        let processed = processLines lines
-        for line in processed do
-            output.WriteLine line
+            let lines = readLines input
+            let processed = processLines lines
+            for line in processed do
+                output.WriteLine line
     with e ->
         Console.Error.WriteLine $"Unexpected error: {e.Message}"
 
