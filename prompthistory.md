@@ -185,3 +185,9 @@ Updating test case structure
 
 TestCase needs an InputContent field as a string option for file input management.
 
+cat test.txt | ./part2.fsx | ./part2-test.fsx under bash results in an error. 
+part2-test.fsx(135,37): error FS0039: The value or constructor 'readLines' is not defined. Maybe you want one of the following:
+   readOnlyDict
+   ReadOnlyMemory
+Both of these scripts should run without error in either direction in both bash and dos and never ever return failure no matter what happens to them
+
