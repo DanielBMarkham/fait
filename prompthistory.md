@@ -124,4 +124,18 @@ Thought for one minute 36 seconds
 
 On Windows Command Prompt (DOS), yes, you can absolutely use pipes for input and output with the script—just like in bash. The issue is that Windows doesn't natively recognize the shebang line (#!/usr/bin/env -S dotnet fsi) to make the .fsx file directly executable. Instead, you need to explicitly invoke the F# interactive runtime with dotnet fsi as a prefix.To pipe input from a file and get output to the console, use this command (replacing cat with the native type equivalent):
 
-I like that. I made that file. Running both scripts, part2.fsx and part2-test.fsx, seems to work under default conditions. I also made a part2-test.cmd dos file so that both scripts are used the same. 
+I like that. I made that file. Running both scripts, part2.fsx and part2-test.fsx, seems to work under default conditions. I also made a part2-test.cmd dos file so that both scripts are used the same. The test script, however, seems to think that the incoming streaming file is the test. It should not be. Instead it should be the output from some previous version of the main code, ie jagged string arrays. The test file should have a section for hard coded tests, perhaps six of them, that default to all passing. In addition, it should take a file that describes the tests to be ran, in the same jagged string format, as an optional input. No input provided, it just runs the hard-coded tests. Both scripts should have standard comman line help options which explain both the purpose, name, and parameters available to the script. In addition, examples should be provided for both help files.
+
+(think think think code)
+
+Thought for 19 seconds
+Evaluating script functionality
+
+Running part2.fsx and part2-test.fsx works fine under default conditions.
+
+The test script mistakenly treats the incoming streaming file as the test.
+
+Let's search for ways to adjust the test script to test the processor instead.
+
+The test script should call the processor and capture its output and errors.
+

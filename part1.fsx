@@ -1,78 +1,105 @@
+#!/usr/bin/env -S dotnet fsi
+
 open System
 open System.IO
 
-let delimiter = '\t'
+let processLine (line: string) : string =
+    line.Split('\t')
+    |> Array.rev
+    |> String.concat "\t"
 
-let processLines (lines: string[]) : string[][] =
-    lines
-    |> Array.map (fun line ->
-        if line = "" then
-            [||]
-        else
-            line.Split(delimiter)
-    )
+let processLines (lines: seq<string>) : seq<string> =
+    Seq.map processLine lines
 
-let processFile (filePath: string) : Result<string[][], string> =
-    try
-        if not (File.Exists filePath) then
-            Error (sprintf "The file '%s' does not exist." filePath)
+type Options = {
+    Input: string option
+    Output: string option
+    Help: bool
+}
+
+let parseOptions (args: string[]) : Options =
+    let rec parse acc remaining =
+        match remaining with
+        | [] -> acc
+        | "-i" :: f :: tail -> parse { acc with Input = Some f } tail
+        | "-o" :: f :: tail -> parse { acc with Output = Some f } tail
+        | ("-h" | "--help") :: _ -> { acc with Help = true }
+        | _ :: tail -> parse acc tail
+    parse { Input = None; Output = None; Help = false } (Array.toList args)
+
+let readLines (reader: TextReader) : seq<string> =
+    seq {
+        let mutable line = reader.ReadLine()
+        while not (Object.ReferenceEquals(line, null)) do
+            yield line
+            line <- reader.ReadLine()
+    }
+
+let getScriptArgs () =
+    let allArgs = Environment.GetCommandLineArgs()
+    if allArgs.Length > 1 then
+        if allArgs.[1] = "fsi" then
+            allArgs |> Array.skip 3
+        elif allArgs.[0].EndsWith("fsi.exe", StringComparison.OrdinalIgnoreCase) then
+            allArgs |> Array.skip 2
         else
-            let lines = File.ReadAllLines filePath
-            if lines.Length = 0 then
-                Error (sprintf "The file '%s' is empty or contains no data." filePath)
-            else
-                Ok (processLines lines)
-    with
-    | ex ->
-        Error (sprintf "An unexpected error occurred: %s" ex.Message)
-//Environment.GetCommandLineArgs
-//let argv = Array.tail (fsi.CommandLineArgs)
-let argv = Array.tail (Environment.GetCommandLineArgs())
-type MainReturnType = | InputLines of string array | NothingThere of unit
-let blines:(MainReturnType) =
-    if argv.Length = 1 then
-        let filePath = argv.[0]
-        match processFile filePath with
-        | Ok jagged -> 
-            // For demonstration or testing, print the structure
-            printfn "Created jagged array with %d rows:" jagged.Length
-            jagged
-            |> Array.iteri (fun i row ->
-                printfn "Row %d: %d columns - %A" i row.Length row
-            )
-            NothingThere (Environment.Exit(0))
-        | Error msg ->
-            printfn "Error: %s" msg
-            NothingThere(Environment.Exit(1))
+            allArgs |> Array.skip 1
     else
-        // Read from stdin if no file path provided (supports piping)
-        let rec readLines acc =
-            let line = Console.ReadLine()
-            if line <> null then
-                readLines (line :: acc)
-            else
-                List.rev acc |> List.toArray
-        InputLines(readLines [])
-let lines = 
-    match blines
-        with
-            | InputLines a->a
-            |_ -> Array.Empty()
-if lines.Length = 0 then
-    printfn "Error: No input data provided via file or stdin."
-    Environment.Exit(1)
+        [||]
 
-let jagged = processLines lines
+let showHelp () =
+    Console.WriteLine "part2.fsx: A script to process tab-delimited text by reversing the order of columns in each line."
+    Console.WriteLine ""
+    Console.WriteLine "Usage: dotnet fsi part2.fsx [options]"
+    Console.WriteLine ""
+    Console.WriteLine "Options:"
+    Console.WriteLine "  -i <file>    Input file (default: stdin)"
+    Console.WriteLine "  -o <file>    Output file (default: stdout)"
+    Console.WriteLine "  -h, --help   Show this help message"
+    Console.WriteLine ""
+    Console.WriteLine "Examples:"
+    Console.WriteLine "  echo \"a\tb\tc\" | dotnet fsi part2.fsx                # Outputs: c\tb\ta"
+    Console.WriteLine "  dotnet fsi part2.fsx -i input.txt -o output.txt      # Processes input.txt to output.txt"
+    Console.WriteLine "  type input.txt | dotnet fsi part2.fsx > output.txt   # Windows pipe example"
 
-// For demonstration or testing, print the structure
-printfn "Created jagged array with %d rows:" jagged.Length
-jagged
-|> Array.iteri (fun i row ->
-    printfn "Row %d: %d columns - %A" i row.Length row
-)
+let main () =
+    try
+        let opts = parseOptions (getScriptArgs ())
 
-// Pure reverse function: takes jagged array and prints to stdout
-let printJagged (jagged: string[][]) (delim: char) : unit =
-    for row in jagged do
-        let line = String.concat (string delim) row
-        printfn "%s" line
+        if opts.Help then
+            showHelp ()
+        else
+            let input, inputDispose =
+                match opts.Input with
+                | None -> Console.In, (fun () -> ())
+                | Some f ->
+                    try
+                        let r = File.OpenText f
+                        r, r.Dispose
+                    with e ->
+                        Console.Error.WriteLine $"Error opening input file '{f}': {e.Message}"
+                        Console.In, (fun () -> ())
+
+            use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
+
+            let output, outputDispose =
+                match opts.Output with
+                | None -> Console.Out, (fun () -> ())
+                | Some f ->
+                    try
+                        let w = File.CreateText f
+                        w, w.Dispose
+                    with e ->
+                        Console.Error.WriteLine $"Error opening output file '{f}': {e.Message}"
+                        Console.Out, (fun () -> ())
+
+            use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
+
+            let lines = readLines input
+            let processed = processLines lines
+            for line in processed do
+                output.WriteLine line
+    with e ->
+        Console.Error.WriteLine $"Unexpected error: {e.Message}"
+
+main ()
