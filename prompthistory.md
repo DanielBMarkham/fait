@@ -139,3 +139,5 @@ Let's search for ways to adjust the test script to test the processor instead.
 
 The test script should call the processor and capture its output and errors.
 
+I went back and started smoke testing the main file, test2-fsx from bash. Maybe I wasn't clear. Both of these scripts should be pipe-able to the other one, ie, when I run cat test.txt | ./part2.fsx | ./part2-test.fsx since there are no test definitions in the incoming file, it should just accept the incoming text without failure and run the hard-coded tests, perhaps warning the user that there was nothing to process. It should work the other way, ie be bidirectional. I should be able to run ./part2-test.fsx | part2.fsx and it should just accept the jagged array and kick it back out, as always.
+
