@@ -205,3 +205,18 @@ The scripts must run without errors in both bash and DOS, never failing.
 
 So if the streams have been closed, or if there's no stream or file provided from the command line, both of these programs should write what they have, close up shop, and do whatever they would normally they would do when a command line program in their particular OS is done
 
+(think think think code)
+Thought for 30s
+Analyzing program behavior
+
+If streams are closed or no stream/file is provided, programs should write their data.
+
+The F# scripts part2.fsx and part2-test.fsx process tab-delimited text, with one reversing columns and the other testing it.
+
+They're designed to handle errors by writing to stderr and exiting gracefully.
+
+For no input, they process an empty sequence and never return failure, with a default exit code of 0.
+
+The scripts already meet the requirement to "close up shop" and exit normally.
+
+

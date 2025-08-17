@@ -4,6 +4,14 @@ open System
 open System.IO
 open System.Diagnostics
 
+let readLines (reader: TextReader) : seq<string> =
+    seq {
+        let mutable line = reader.ReadLine()
+        while not (Object.ReferenceEquals(line, null)) do
+            yield line
+            line <- reader.ReadLine()
+    }
+
 let verifyOutput (actual: string) (expected: string) : bool =
     actual.Trim() = expected.Trim()
 
@@ -19,17 +27,19 @@ type TestCase = {
     InputContent: string option
 }
 
-let parseTestLine (line: string) : TestCase =
-    let parts = line.Split('\t')
-    if parts.Length < 3 then failwith $"Invalid test line: {line}"
-    {
-        Name = parts.[0]
-        Input = if parts.[1] = "" then None else Some (parts.[1].Replace("\\n", "\n"))
-        ExpectedOut = parts.[2].Replace("\\n", "\n")
-        ExpectedErrSubstring = if parts.Length > 3 && parts.[3] <> "" then Some parts.[3] else None
-        Args = if parts.Length > 4 then parts.[4] else ""
-        InputContent = if parts.Length > 5 && parts.[5] <> "" then Some (parts.[5].Replace("\\n", "\n")) else None
-    }
+let parseTestLine (line: string) : TestCase option =
+    try
+        let parts = line.Split('\t')
+        if parts.Length < 3 then None else
+        Some {
+            Name = parts.[0]
+            Input = if parts.[1] = "" then None else Some (parts.[1].Replace("\\n", "\n"))
+            ExpectedOut = parts.[2].Replace("\\n", "\n")
+            ExpectedErrSubstring = if parts.Length > 3 && parts.[3] <> "" then Some parts.[3] else None
+            Args = if parts.Length > 4 then parts.[4] else ""
+            InputContent = if parts.Length > 5 && parts.[5] <> "" then Some (parts.[5].Replace("\\n", "\n")) else None
+        }
+    with _ -> None
 
 let getHardCodedTests () : TestCase list =
     [
@@ -83,14 +93,6 @@ let showHelp () =
     Console.WriteLine "  dotnet fsi part2-test.fsx                    # Run hard-coded tests"
     Console.WriteLine "  dotnet fsi part2-test.fsx -t tests.txt       # Run tests from file"
 
-let readLines (reader: TextReader) : seq<string> =
-    seq {
-        let mutable line = reader.ReadLine()
-        while not (Object.ReferenceEquals(line, null)) do
-            yield line
-            line <- reader.ReadLine()
-    }
-
 let main () =
     try
         let opts = parseOptions (getScriptArgs ())
@@ -117,13 +119,12 @@ let main () =
                 out, err, p.ExitCode
 
             let tryParseTests (lines: seq<string>) : TestCase list option =
-                try
+                let parsed =
                     lines
                     |> Seq.filter (fun line -> line.Trim() <> "" && not (line.StartsWith("#")))
-                    |> Seq.map parseTestLine
+                    |> Seq.choose parseTestLine
                     |> Seq.toList
-                    |> Some
-                with _ -> None
+                if parsed.IsEmpty then None else Some parsed
 
             let tests =
                 match opts.TestFile with
