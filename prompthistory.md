@@ -112,3 +112,7 @@ Let's call these two scripts part2.fsx and part2-test.fsx The first script seems
 
   Currently looking for more info on handling command line args in F# scripts to confirm the approach.
 
+(think think think code)
+
+(seems to work the same under bash. no compiler warnings now, but stil no output under dos)
+
