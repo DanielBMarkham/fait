@@ -83,6 +83,14 @@ let showHelp () =
     Console.WriteLine "  dotnet fsi part2-test.fsx                    # Run hard-coded tests"
     Console.WriteLine "  dotnet fsi part2-test.fsx -t tests.txt       # Run tests from file"
 
+let readLines (reader: TextReader) : seq<string> =
+    seq {
+        let mutable line = reader.ReadLine()
+        while not (Object.ReferenceEquals(line, null)) do
+            yield line
+            line <- reader.ReadLine()
+    }
+
 let main () =
     try
         let opts = parseOptions (getScriptArgs ())
@@ -184,13 +192,5 @@ let main () =
                     Console.Error.WriteLine $"Error running test '{test.Name}': {e.Message}"
     with e ->
         Console.Error.WriteLine $"Unexpected error: {e.Message}"
-
-let readLines (reader: TextReader) : seq<string> =
-    seq {
-        let mutable line = reader.ReadLine()
-        while not (Object.ReferenceEquals(line, null)) do
-            yield line
-            line <- reader.ReadLine()
-    }
 
 main ()

@@ -191,3 +191,15 @@ part2-test.fsx(135,37): error FS0039: The value or constructor 'readLines' is no
    ReadOnlyMemory
 Both of these scripts should run without error in either direction in both bash and dos and never ever return failure no matter what happens to them
 
+(think think think code)
+Throught for21s
+Analyzing error
+
+The error "FS0039: The value or constructor 'readLines' is not defined" occurred when running scripts in bash.
+
+readLines is defined after main, which uses it, causing the issue in F#.
+
+Moving readLines before main in part2-test.fsx should fix the error.
+
+The scripts must run without errors in both bash and DOS, never failing.
+
