@@ -33,9 +33,21 @@ let readLines (reader: TextReader) : seq<string> =
             line <- reader.ReadLine()
     }
 
+let getScriptArgs () =
+    let allArgs = Environment.GetCommandLineArgs()
+    if allArgs.Length > 1 then
+        if allArgs.[1] = "fsi" then
+            allArgs |> Array.skip 3
+        elif allArgs.[0].EndsWith("fsi.exe", StringComparison.OrdinalIgnoreCase) then
+            allArgs |> Array.skip 2
+        else
+            allArgs |> Array.skip 1
+    else
+        [||]
+
 let main () =
     try
-        let opts = parseOptions fsi.CommandLineArgs
+        let opts = parseOptions (getScriptArgs ())
 
         let input, inputDispose =
             match opts.Input with

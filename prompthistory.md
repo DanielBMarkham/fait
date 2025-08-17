@@ -79,7 +79,36 @@ I would like an F# script, executable from either the windows or bash command li
 
 (putting this into part2.fsx)
 
+(think think think code)
+
+(I run a simple test)
+
+Let's call these two scripts part2.fsx and part2-test.fsx The first script seems to work from bash, but the compiler is giving a warn about the type or namespace fsi is not defined. When calling from DOS, however, the command cat test.txt | part2.fsx generates no output at all. It was supposed to pipe all input and output using the stdin and stout features or their equivalents in the OS being used and use fsi or whatever the equivalents are to find the command line arguments.
 
 
+  Thought for 1 minute 20 seconds
 
+  Investigating script issues
+
+  The script part2.fsx works in bash but shows a warning about undefined type or namespace fsi.
+
+  In F#, fsi.CommandLineArgs is used for command line args, but fsi might not be recognized outside interactive mode.
+
+  To make it executable on both Windows and Unix, let's consider using dotnet fsi explicitly for cross-platform compatibility.
+
+  For cross-platform, System.Environment.GetCommandLineArgs() can work, skipping the first few elements like "dotnet" and "fsi".
+
+  On Windows, the script generates no output with "cat test.txt | part2.fsx" since cat isn't available; use "type test.txt | dotnet fsi part2.fsx" instead.
+
+  Exploring fsi warning solutions
+
+  The warning suggests fsi isn't defined, possibly when not run with dotnet fsi.
+
+  Let's search for ways to get command line args in F# scripts across platforms.
+
+  A standard approach is to find the script name in the args and take the rest as user arguments.
+
+  To fix, we'll update both scripts to use a method that skips to the script name and takes the tail, avoiding fsi references.
+
+  Currently looking for more info on handling command line args in F# scripts to confirm the approach.
 
