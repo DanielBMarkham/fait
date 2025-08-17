@@ -203,3 +203,5 @@ Moving readLines before main in part2-test.fsx should fix the error.
 
 The scripts must run without errors in both bash and DOS, never failing.
 
+So if the streams have been closed, or if there's no stream or file provided from the command line, both of these programs should write what they have, close up shop, and do whatever they would normally they would do when a command line program in their particular OS is done
+
