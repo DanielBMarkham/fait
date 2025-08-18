@@ -220,3 +220,23 @@ For no input, they process an empty sequence and never return failure, with a de
 The scripts already meet the requirement to "close up shop" and exit normally.
 
 
+I forgot to tell you that if the user picks the help option from the command line, the help and usage information should display before anything else happens. Also there should be a verbose option, with the choices being ERROR, WARN, and INFO. It should default to ERROR, which is just the error processing we currently have. On the highest verbosity setting, INFO,  the entrance and exit of each function should be written to STERR for the appropriate platform (which is where the current error information should be going)
+
+(think think think code)
+Thought for 29s
+Analyzing command line options
+
+The help option needs to display usage info before other actions.
+
+Both scripts already check for help at main's start, showing it before proceeding.
+
+A verbose option with levels ERROR, WARN, and INFO is needed, defaulting to ERROR.
+
+At INFO level, log entrance and exit of each function to stderr.
+
+Let's update both part2.fsx and part2-test.fsx to include verbosity.
+
+
+How do I call these two scripts from command line batch files, like we discussed earlier, eg type test.txt | dotnet fsi part2.fsx for dos and also pass in the command line options dotnet keeps catching the help option and displaying the dotnet help information. I would like the help information for each of these files in each of these environments, and I'd like to call them just using one token, not a bunch of them. That dos idea was pretty good
+
+(think think think code)

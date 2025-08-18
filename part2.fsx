@@ -3,19 +3,21 @@
 open System
 open System.IO
 
-let processLine (line: string) : string =
-    line.Split('\t')
-    |> Array.rev
-    |> String.concat "\t"
-
-let processLines (lines: seq<string>) : seq<string> =
-    Seq.map processLine lines
+type Verbosity = Error | Warn | Info
 
 type Options = {
     Input: string option
     Output: string option
     Help: bool
+    Verbosity: Verbosity
 }
+
+let parseVerbosity (s: string) =
+    match s.ToLowerInvariant() with
+    | "error" -> Error
+    | "warn" -> Warn
+    | "info" -> Info
+    | _ -> Error  // Default on invalid
 
 let parseOptions (args: string[]) : Options =
     let rec parse acc remaining =
@@ -23,17 +25,42 @@ let parseOptions (args: string[]) : Options =
         | [] -> acc
         | "-i" :: f :: tail -> parse { acc with Input = Some f } tail
         | "-o" :: f :: tail -> parse { acc with Output = Some f } tail
+        | "-v" :: l :: tail -> parse { acc with Verbosity = parseVerbosity l } tail
         | ("-h" | "--help") :: _ -> { acc with Help = true }
         | _ :: tail -> parse acc tail
-    parse { Input = None; Output = None; Help = false } (Array.toList args)
+    parse { Input = None; Output = None; Help = false; Verbosity = Error } (Array.toList args)
 
-let readLines (reader: TextReader) : seq<string> =
-    seq {
+let log (opts: Options) (level: Verbosity) (msg: string) =
+    let shouldLog =
+        match opts.Verbosity, level with
+        | Info, _ -> true
+        | Warn, Warn | Warn, Error -> true
+        | Error, Error -> true
+        | _ -> false
+    if shouldLog then Console.Error.WriteLine msg
+
+let processLine (opts: Options) (line: string) : string =
+    log opts Info "Entering processLine"
+    let result = line.Split('\t') |> Array.rev |> String.concat "\t"
+    log opts Info "Exiting processLine"
+    result
+
+let processLines (opts: Options) (lines: seq<string>) : seq<string> =
+    log opts Info "Entering processLines"
+    let result = Seq.map (processLine opts) lines
+    log opts Info "Exiting processLines"
+    result
+
+let readLines (opts: Options) (reader: TextReader) : seq<string> =
+    log opts Info "Entering readLines"
+    let result = seq {
         let mutable line = reader.ReadLine()
         while not (Object.ReferenceEquals(line, null)) do
             yield line
             line <- reader.ReadLine()
     }
+    log opts Info "Exiting readLines"
+    result
 
 let getScriptArgs () =
     let allArgs = Environment.GetCommandLineArgs()
@@ -55,6 +82,7 @@ let showHelp () =
     Console.WriteLine "Options:"
     Console.WriteLine "  -i <file>    Input file (default: stdin)"
     Console.WriteLine "  -o <file>    Output file (default: stdout)"
+    Console.WriteLine "  -v <level>   Verbosity level: ERROR, WARN, INFO (default: ERROR)"
     Console.WriteLine "  -h, --help   Show this help message"
     Console.WriteLine ""
     Console.WriteLine "Examples:"
@@ -69,6 +97,8 @@ let main () =
         if opts.Help then
             showHelp ()
         else
+            log opts Info "Entering main"
+
             let input, inputDispose =
                 match opts.Input with
                 | None -> Console.In, (fun () -> ())
@@ -77,7 +107,7 @@ let main () =
                         let r = File.OpenText f
                         r, r.Dispose
                     with e ->
-                        Console.Error.WriteLine $"Error opening input file '{f}': {e.Message}"
+                        log opts Error $"Error opening input file '{f}': {e.Message}"
                         Console.In, (fun () -> ())
 
             use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
@@ -90,16 +120,19 @@ let main () =
                         let w = File.CreateText f
                         w, w.Dispose
                     with e ->
-                        Console.Error.WriteLine $"Error opening output file '{f}': {e.Message}"
+                        log opts Error $"Error opening output file '{f}': {e.Message}"
                         Console.Out, (fun () -> ())
 
             use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
 
-            let lines = readLines input
-            let processed = processLines lines
+            let lines = readLines opts input
+            let processed = processLines opts lines
             for line in processed do
                 output.WriteLine line
+
+            log opts Info "Exiting main"
     with e ->
-        Console.Error.WriteLine $"Unexpected error: {e.Message}"
+        let opts = parseOptions (getScriptArgs ())  // Fallback opts for logging
+        log opts Error $"Unexpected error: {e.Message}"
 
 main ()
