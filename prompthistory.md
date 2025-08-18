@@ -260,3 +260,8 @@ To continue using non-conforming indentation, pass the '--strict-indentation-' f
 (think think think code)
 
 thought for 31s
+FORGOT TO PASTE THIS IN
+
+That's pretty cool grok, but it doesn't work. For one, you messed up the indentation in the second script in the parseTestLines function. I fixed it for you. Also the command examples you give don't work. For example, in git bash when I type dotnet fsi part2.fsx -i test.txt -o output.txt it creates a file but never writes to it. It also leaves the pipe open for console input when I clearly have provided all the input I want the command to use. When adding -h to the end, I don't get the script help, I'm still getting the dotnet help. Can you fix that?
+
+
