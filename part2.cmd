@@ -1,1 +1,1 @@
-type test.txt | dotnet fsi part2.fsx
+@dotnet fsi %~dp0part2.fsx %*
