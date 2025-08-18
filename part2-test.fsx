@@ -73,21 +73,21 @@ type TestCase = {
 let parseTestLine (opts: Options) (line: string) : TestCase option =
     log opts Info "Entering parseTestLine"
     let result = try
-        let parts = line.Split('\t')
-        if parts.Length < 3 then None else
-        Some {
-            Name = parts.[0]
-            Input = if parts.[1] = "" then None else Some (parts.[1].Replace("\\n", "\n"))
-            ExpectedOut = parts.[2].Replace("\\n", "\n")
-            ExpectedErrSubstring = if parts.Length > 3 && parts.[3] <> "" then Some parts.[3] else None
-            Args = if parts.Length > 4 then parts.[4] else ""
-            InputContent = if parts.Length > 5 && parts.[5] <> "" then Some (parts.[5].Replace("\\n", "\n")) else None
-        }
-    with _ -> None
+                    let parts = line.Split('\t')
+                    if parts.Length < 3 then None else
+                    Some {
+                        Name = parts.[0]
+                        Input = if parts.[1] = "" then None else Some (parts.[1].Replace("\\n", "\n"))
+                        ExpectedOut = parts.[2].Replace("\\n", "\n")
+                        ExpectedErrSubstring = if parts.Length > 3 && parts.[3] <> "" then Some parts.[3] else None
+                        Args = if parts.Length > 4 then parts.[4] else ""
+                        InputContent = if parts.Length > 5 && parts.[5] <> "" then Some (parts.[5].Replace("\\n", "\n")) else None
+                    }
+                    with _ -> None
     log opts Info "Exiting parseTestLine"
     result
 
-let getHardCodedTests (opts: Options) () : TestCase list =
+let getHardCodedTests (opts: Options) : TestCase list =
     log opts Info "Entering getHardCodedTests"
     let result = [
         { Name = "Simple stdin/stdout"; Input = Some "a\tb\tc\n1\t2\t3\n"; ExpectedOut = "c\tb\ta\n3\t2\t1\n"; ExpectedErrSubstring = None; Args = ""; InputContent = None }
@@ -120,7 +120,7 @@ let showHelp () =
     Console.WriteLine ""
     Console.WriteLine "Options:"
     Console.WriteLine "  -t <file>    Test file in tab-delimited format (default: run hard-coded tests)"
-    Console.WriteLine "               Format per line: name\tinput\t.expected\t[err_substring]\t[args]\t[input_content]"
+    Console.WriteLine "               Format per line: name\tinput\t expected\t[err_substring]\t[args]\t[input_content]"
     Console.WriteLine "               input, expected, and input_content support \\n for newlines."
     Console.WriteLine "  -v <level>   Verbosity level: ERROR, WARN, INFO (default: ERROR)"
     Console.WriteLine "  -h, --help   Show this help message"
@@ -178,10 +178,10 @@ let main () =
                         | Some ts -> ts
                         | None -> 
                             log opts Warn "Warning: Invalid test format in file; running hard-coded tests."
-                            getHardCodedTests opts ()
+                            getHardCodedTests opts
                     with e ->
                         log opts Error $"Error reading test file '{f}': {e.Message}"
-                        getHardCodedTests opts ()
+                        getHardCodedTests opts
                 | None ->
                     if Console.IsInputRedirected then
                         let lines = readLines opts Console.In
@@ -189,9 +189,9 @@ let main () =
                         | Some ts -> ts
                         | None -> 
                             log opts Warn "Warning: Invalid test format in piped input; running hard-coded tests."
-                            getHardCodedTests opts ()
+                            getHardCodedTests opts
                     else
-                        getHardCodedTests opts ()
+                        getHardCodedTests opts
 
             for test in tests do
                 try
