@@ -296,4 +296,5 @@ To fix indentation, let's try putting 'try' on its own line under 'let result ='
 
 For output not writing, adding output.Flush() after the loop might help, though dispose should handle it.
 
+You fixed part of it. output.txt now writes and the program exits. but when I type dotnet fsi part2.fsx -i test.txt -o output.txt -h I'm still getting the dotnet help displayed to the console, when I would expect it to give me the help I requested so I can see it in the console, then, after displaying help, continue to process output.txt and finish up. I hope you're fixing both of these files as we go along, and not just the one I tested, since the architecture for both should be as similar as possible.  I haven't tried it under dos. I only tested the main script in bash, but I suspect that these problems exist for both scripts in both environments. Can you fix that? Nice work with the indents, though.
 
