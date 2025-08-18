@@ -129,6 +129,8 @@ let showHelp () =
     Console.WriteLine "Examples:"
     Console.WriteLine "  dotnet fsi part2-test.fsx                    # Run hard-coded tests"
     Console.WriteLine "  dotnet fsi part2-test.fsx -t tests.txt       # Run tests from file"
+    Console.WriteLine ""
+    Console.WriteLine "Note: To avoid option interception by dotnet or fsi, use -- before script options if needed, e.g., dotnet fsi part2-test.fsx -- -h"
 
 let main () =
     try
@@ -136,107 +138,107 @@ let main () =
 
         if opts.Help then
             showHelp ()
-        else
-            log opts Info "Entering main"
 
-            let scriptPath = "part2.fsx"  // Assumes part2.fsx is in the same directory
+        log opts Info "Entering main"
 
-            let runProcessor (args: string) (inputText: string option) : string * string * int =
-                log opts Info "Entering runProcessor"
-                let psi = ProcessStartInfo("dotnet", $"fsi {scriptPath} {args}")
-                psi.RedirectStandardInput <- inputText.IsSome
-                psi.RedirectStandardOutput <- true
-                psi.RedirectStandardError <- true
-                psi.UseShellExecute <- false
-                use p = new Process(StartInfo = psi)
-                p.Start() |> ignore
-                if inputText.IsSome then
-                    p.StandardInput.Write(inputText.Value)
-                    p.StandardInput.Close()
-                p.WaitForExit()
-                let out = p.StandardOutput.ReadToEnd()
-                let err = p.StandardError.ReadToEnd()
-                log opts Info "Exiting runProcessor"
-                out, err, p.ExitCode
+        let scriptPath = "part2.fsx"  // Assumes part2.fsx is in the same directory
 
-            let tryParseTests (lines: seq<string>) : TestCase list option =
-                log opts Info "Entering tryParseTests"
-                let parsed =
-                    lines
-                    |> Seq.filter (fun line -> line.Trim() <> "" && not (line.StartsWith("#")))
-                    |> Seq.choose (parseTestLine opts)
-                    |> Seq.toList
-                let result = if parsed.IsEmpty then None else Some parsed
-                log opts Info "Exiting tryParseTests"
-                result
+        let runProcessor (args: string) (inputText: string option) : string * string * int =
+            log opts Info "Entering runProcessor"
+            let psi = ProcessStartInfo("dotnet", $"fsi {scriptPath} {args}")
+            psi.RedirectStandardInput <- inputText.IsSome
+            psi.RedirectStandardOutput <- true
+            psi.RedirectStandardError <- true
+            psi.UseShellExecute <- false
+            use p = new Process(StartInfo = psi)
+            p.Start() |> ignore
+            if inputText.IsSome then
+                p.StandardInput.Write(inputText.Value)
+                p.StandardInput.Close()
+            p.WaitForExit()
+            let out = p.StandardOutput.ReadToEnd()
+            let err = p.StandardError.ReadToEnd()
+            log opts Info "Exiting runProcessor"
+            out, err, p.ExitCode
 
-            let tests =
-                match opts.TestFile with
-                | Some f ->
-                    try
-                        let lines = File.ReadLines f
-                        match tryParseTests lines with
-                        | Some ts -> ts
-                        | None -> 
-                            log opts Warn "Warning: Invalid test format in file; running hard-coded tests."
-                            getHardCodedTests opts
-                    with e ->
-                        log opts Error $"Error reading test file '{f}': {e.Message}"
-                        getHardCodedTests opts
-                | None ->
-                    if Console.IsInputRedirected then
-                        let lines = readLines opts Console.In
-                        match tryParseTests lines with
-                        | Some ts -> ts
-                        | None -> 
-                            log opts Warn "Warning: Invalid test format in piped input; running hard-coded tests."
-                            getHardCodedTests opts
-                    else
-                        getHardCodedTests opts
+        let tryParseTests (lines: seq<string>) : TestCase list option =
+            log opts Info "Entering tryParseTests"
+            let parsed =
+                lines
+                |> Seq.filter (fun line -> line.Trim() <> "" && not (line.StartsWith("#")))
+                |> Seq.choose (parseTestLine opts)
+                |> Seq.toList
+            let result = if parsed.IsEmpty then None else Some parsed
+            log opts Info "Exiting tryParseTests"
+            result
 
-            for test in tests do
+        let tests =
+            match opts.TestFile with
+            | Some f ->
                 try
-                    let tempInOpt =
-                        if test.Args.Contains("TEMP_IN") && test.InputContent.IsSome then
-                            let temp = Path.GetTempFileName()
-                            File.WriteAllText(temp, test.InputContent.Value)
-                            Some temp
-                        else None
-
-                    let tempOutOpt =
-                        if test.Args.Contains("TEMP_OUT") then
-                            Some (Path.GetTempFileName())
-                        else None
-
-                    let args =
-                        test.Args
-                        |> fun a -> match tempInOpt with | Some t -> a.Replace("TEMP_IN", t) | None -> a
-                        |> fun a -> match tempOutOpt with | Some t -> a.Replace("TEMP_OUT", t) | None -> a
-
-                    let out, err, code = runProcessor args test.Input
-
-                    let actualOut =
-                        match tempOutOpt with
-                        | Some f ->
-                            let content = File.ReadAllText f
-                            try File.Delete f with _ -> ()
-                            content
-                        | None -> out
-
-                    let outPass = verifyOutput opts actualOut test.ExpectedOut
-                    let errPass = match test.ExpectedErrSubstring with
-                                  | None -> err.Trim() = ""
-                                  | Some s -> verifyErrorContains opts err s
-                    let overall = if outPass && errPass then "PASS" else "FAIL"
-                    Console.WriteLine $"{test.Name}\t{overall}\tExit code: {code}\tOut match: {outPass}\tErr match: {errPass}\tError: '{err.Trim()}'"
-
-                    match tempInOpt with
-                    | Some f -> try File.Delete f with _ -> ()
-                    | None -> ()
+                    let lines = File.ReadLines f
+                    match tryParseTests lines with
+                    | Some ts -> ts
+                    | None -> 
+                        log opts Warn "Warning: Invalid test format in file; running hard-coded tests."
+                        getHardCodedTests opts
                 with e ->
-                    log opts Error $"Error running test '{test.Name}': {e.Message}"
+                    log opts Error $"Error reading test file '{f}': {e.Message}"
+                    getHardCodedTests opts
+            | None ->
+                if Console.IsInputRedirected then
+                    let lines = readLines opts Console.In
+                    match tryParseTests lines with
+                    | Some ts -> ts
+                    | None -> 
+                        log opts Warn "Warning: Invalid test format in piped input; running hard-coded tests."
+                        getHardCodedTests opts
+                else
+                    getHardCodedTests opts
 
-            log opts Info "Exiting main"
+        for test in tests do
+            try
+                let tempInOpt =
+                    if test.Args.Contains("TEMP_IN") && test.InputContent.IsSome then
+                        let temp = Path.GetTempFileName()
+                        File.WriteAllText(temp, test.InputContent.Value)
+                        Some temp
+                    else None
+
+                let tempOutOpt =
+                    if test.Args.Contains("TEMP_OUT") then
+                        Some (Path.GetTempFileName())
+                    else None
+
+                let args =
+                    test.Args
+                    |> fun a -> match tempInOpt with | Some t -> a.Replace("TEMP_IN", t) | None -> a
+                    |> fun a -> match tempOutOpt with | Some t -> a.Replace("TEMP_OUT", t) | None -> a
+
+                let out, err, code = runProcessor args test.Input
+
+                let actualOut =
+                    match tempOutOpt with
+                    | Some f ->
+                        let content = File.ReadAllText f
+                        try File.Delete f with _ -> ()
+                        content
+                    | None -> out
+
+                let outPass = verifyOutput opts actualOut test.ExpectedOut
+                let errPass = match test.ExpectedErrSubstring with
+                              | None -> err.Trim() = ""
+                              | Some s -> verifyErrorContains opts err s
+                let overall = if outPass && errPass then "PASS" else "FAIL"
+                Console.WriteLine $"{test.Name}\t{overall}\tExit code: {code}\tOut match: {outPass}\tErr match: {errPass}\tError: '{err.Trim()}'"
+
+                match tempInOpt with
+                | Some f -> try File.Delete f with _ -> ()
+                | None -> ()
+            with e ->
+                log opts Error $"Error running test '{test.Name}': {e.Message}"
+
+        log opts Info "Exiting main"
     with e ->
         let opts = parseOptions (getScriptArgs ())  // Fallback opts for logging
         log opts Error $"Unexpected error: {e.Message}"

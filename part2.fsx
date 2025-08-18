@@ -89,6 +89,8 @@ let showHelp () =
     Console.WriteLine "  echo \"a\tb\tc\" | dotnet fsi part2.fsx                # Outputs: c\tb\ta"
     Console.WriteLine "  dotnet fsi part2.fsx -i input.txt -o output.txt      # Processes input.txt to output.txt"
     Console.WriteLine "  type input.txt | dotnet fsi part2.fsx > output.txt   # Windows pipe example"
+    Console.WriteLine ""
+    Console.WriteLine "Note: To avoid option interception by dotnet or fsi, use -- before script options if needed, e.g., dotnet fsi part2.fsx -- -h"
 
 let main () =
     try
@@ -96,42 +98,42 @@ let main () =
 
         if opts.Help then
             showHelp ()
-        else
-            log opts Info "Entering main"
 
-            let input, inputDispose =
-                match opts.Input with
-                | None -> Console.In, (fun () -> ())
-                | Some f ->
-                    try
-                        let r = File.OpenText f
-                        r, r.Dispose
-                    with e ->
-                        log opts Error $"Error opening input file '{f}': {e.Message}"
-                        Console.In, (fun () -> ())
+        log opts Info "Entering main"
 
-            use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
+        let input, inputDispose =
+            match opts.Input with
+            | None -> Console.In, (fun () -> ())
+            | Some f ->
+                try
+                    let r = File.OpenText f
+                    r, r.Dispose
+                with e ->
+                    log opts Error $"Error opening input file '{f}': {e.Message}"
+                    Console.In, (fun () -> ())
 
-            let output, outputDispose =
-                match opts.Output with
-                | None -> Console.Out, (fun () -> ())
-                | Some f ->
-                    try
-                        let w = File.CreateText f
-                        w, w.Dispose
-                    with e ->
-                        log opts Error $"Error opening output file '{f}': {e.Message}"
-                        Console.Out, (fun () -> ())
+        use _inputDisposer = { new IDisposable with member _.Dispose() = inputDispose () }
 
-            use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
+        let output, outputDispose =
+            match opts.Output with
+            | None -> Console.Out, (fun () -> ())
+            | Some f ->
+                try
+                    let w = File.CreateText f
+                    w, w.Dispose
+                with e ->
+                    log opts Error $"Error opening output file '{f}': {e.Message}"
+                    Console.Out, (fun () -> ())
 
-            let lines = readLines opts input
-            let processed = processLines opts lines
-            for line in processed do
-                output.WriteLine line
-            output.Flush()
+        use _outputDisposer = { new IDisposable with member _.Dispose() = outputDispose () }
 
-            log opts Info "Exiting main"
+        let lines = readLines opts input
+        let processed = processLines opts lines
+        for line in processed do
+            output.WriteLine line
+        output.Flush()
+
+        log opts Info "Exiting main"
     with e ->
         let opts = parseOptions (getScriptArgs ())  // Fallback opts for logging
         log opts Error $"Unexpected error: {e.Message}"
