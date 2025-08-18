@@ -253,3 +253,10 @@ For DOS, creating .cmd files like part2.cmd with "@dotnet
 INSTRUCTIONS FROM GROK
 Calling the Scripts in Windows Command Prompt (DOS) and BashTo make calling the scripts simpler and more consistent (using a single "token" like part2 instead of the full dotnet fsi part2.fsx), follow these setups. This builds on the earlier .cmd idea for Windows, and uses the shebang for bash (where the scripts are already executable). If you want true single-token execution without ./ in bash or full paths in DOS, add the script directory to your system's PATH environment variable.Windows Command Prompt (DOS)Create part2.cmd in the same directory as part2.fsx with this content:
 
+(plays around)
+This second script you gave me, the test one, does not compile. I get 14 errors, the first one being part2-test.fsx(76,9): error FS0058: Unexpected syntax or possible incorrect indentation: this token is offside of context started at position (75:18). Try indenting this further.
+To continue using non-conforming indentation, pass the '--strict-indentation-' flag to the compiler, or set the language version to F# 7.
+
+(think think think code)
+
+thought for 31s
