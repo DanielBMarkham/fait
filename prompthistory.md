@@ -264,4 +264,36 @@ FORGOT TO PASTE THIS IN
 
 That's pretty cool grok, but it doesn't work. For one, you messed up the indentation in the second script in the parseTestLines function. I fixed it for you. Also the command examples you give don't work. For example, in git bash when I type dotnet fsi part2.fsx -i test.txt -o output.txt it creates a file but never writes to it. It also leaves the pipe open for console input when I clearly have provided all the input I want the command to use. When adding -h to the end, I don't get the script help, I'm still getting the dotnet help. Can you fix that?
 
+(think think think code)
+Thought for 10s
+Investigating script issues
+
+The second script in parseTestLines has incorrect indentation, which was fixed.
+
+In Git Bash, dotnet fsi part2.fsx -i test.txt -o output.txt creates an output file but doesn't write to it.
+
+It seems the script might fall back to stdin, waiting for input even with -i provided.
+
+For help, dotnet fsi part2.fsx -h shows dotnet help instead of script help, which is unexpected.
+
+If test.txt doesn't exist, it falls back to stdin and might hang, waiting for input.
+
+Analyzing command behavior
+
+In Git Bash, Environment.GetCommandLineArgs() processes args correctly, like ["dotnet"; "fsi"; "part2.fsx"; "-i"; "test.txt"; "-o"; "output.txt"].
+
+The 'with' in the F# code must align with 'try', or it throws an FS0058 error for incorrect indentation.
+
+For output not writing, maybe add flushing, but the code should close and flush on exit.
+
+Let's check the line count in the second script to confirm the error location.
+
+The error at line 76,9 suggests 'with' isn't aligned with 'try', causing an offside context error.
+
+Refining code structure
+
+To fix indentation, let's try putting 'try' on its own line under 'let result ='.
+
+For output not writing, adding output.Flush() after the loop might help, though dispose should handle it.
+
 
