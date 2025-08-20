@@ -20,3 +20,8 @@ In operation, these two script files should perform just like the cat utility bu
 - Each of these two scripts should support a default set of command line parameters that one would expect from the underlying OS. -i for input file, -o for output file, -v to set verbosity level, and -h for help
 - If the help option is provided, the appropriate help information is sent out first, before any processing takes place. This allows new users to make mistakes and then correct them, such as having a hanging terming (where neither an input file or piped input is provided, they're left to provide text by typing it in at the console, which isn't always clear to them.) The help text should explain all of the options and provide several usage examples in both dos and bash.
 - verbosity has three levels, INFO, WARN, and ERROR. ERROR is the default. When requesting the INFO mode, all function entrances and exits are logged
+
+### Testing
+In adition to all of this, if you can provide any of this also as an executable test called from the command line, that would be great. Should be one version for bash and one for dos
+
+// You made a try-with-finally when you can't do that. It has to be a try-finally wrapping another try-with. Here, I fixed it for you 
