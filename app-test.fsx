@@ -63,13 +63,13 @@ let parseArgs (args: string[]) =
     let mutable i = 0
     while i < args.Length do
         let arg = args.[i]
-        if arg = "-i" then
+        if arg = "--i" then
             i <- i + 1
             if i < args.Length then inputFile <- Some args.[i]
-        elif arg = "-o" then
+        elif arg = "--o" then
             i <- i + 1
             if i < args.Length then outputFile <- Some args.[i]
-        elif arg = "-v" then
+        elif arg = "--v" then
             i <- i + 1
             if i < args.Length then
                 match args.[i].ToUpper() with
@@ -77,7 +77,7 @@ let parseArgs (args: string[]) =
                 | "WARN" -> verbosity <- LogLevel.Warn
                 | "ERROR" -> verbosity <- LogLevel.Error
                 | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
-        elif arg = "-h" then
+        elif arg = "--h" then
             showHelp <- true
         else
             log LogLevel.Error (sprintf "Unknown option: %s" arg)
@@ -88,10 +88,10 @@ let helpText = """
 Usage: app-test [options]
 
 Options:
-  -i <file>   Input file (default: stdin)
-  -o <file>   Output file (default: stdout)
-  -v <level>  Verbosity level: INFO, WARN, ERROR (default: ERROR)
-  -h          Show this help
+  --i <file>   Input file (default: stdin)
+  --o <file>   Output file (default: stdout)
+  --v <level>  Verbosity level: INFO, WARN, ERROR (default: ERROR)
+  --h          Show this help
 
 This program reads tab-delimited text, processes it by reversing the order of clusters in each line and reversing the words in each cluster, and outputs the result.
 It operates in streaming mode, processing line by line.
@@ -99,11 +99,11 @@ It also runs internal smoke tests and logs results at WARN level.
 
 Examples:
 In DOS:
-  app-test.cmd -i sample.txt -o output.txt
+  app-test.cmd --i sample.txt --o output.txt
   type sample.txt | app-test.cmd > output.txt
 
 In Bash:
-  ./app-test -i sample.txt -o output.txt
+  ./app-test --i sample.txt --o output.txt
   cat sample.txt | ./app-test > output.txt
 
 If no input is provided, it reads from stdin, which may appear as hanging if waiting for keyboard input.

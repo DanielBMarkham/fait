@@ -25,3 +25,6 @@ In operation, these two script files should perform just like the cat utility bu
 In adition to all of this, if you can provide any of this also as an executable test called from the command line, that would be great. Should be one version for bash and one for dos
 
 // You made a try-with-finally when you can't do that. It has to be a try-finally wrapping another try-with. Here, I fixed it for you 
+(think code checkin)
+// I need you to make the command line options double dash instead of single dash, ie --h instead of -h. Otherwise the options keep escaping the script and end up being processed by dotnet. Be sure to fix both files
+(think think code checkin)
