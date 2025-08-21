@@ -1,9 +1,9 @@
 #load "applib.fsx"
-#r "FSharp.Compiler.Service.dll"
 
 open System
 open System.IO
 open Microsoft.FSharp.Compiler.Interactive.Settings
+open Applib
 
 let runSmokeTests () =
     let test (name: string) (input: string[][]) (expected: string[][]) =

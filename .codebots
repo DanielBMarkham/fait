@@ -40,5 +40,6 @@ In adition to all of this, if you can provide any of this also as an executable 
 // When I run  cat sample.txt | ./app from bash I get app.fsx(40,43): error FS0039: The value or constructor 'parseArgs' is not defined.
 (think think code checkin)
 // Now when I run it I get app.fsx(5,44): error FS0039: The namespace 'Shell' is not defined.
-
-
+(think think code checkin)
+// Now it's back again. From bash when I run cat sample.txt | ./app I get app.fsx(39,43): error FS0039: The value or constructor 'parseArgs' is not defined.
+(think think code checkin)
