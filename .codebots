@@ -37,4 +37,5 @@ In adition to all of this, if you can provide any of this also as an executable 
 // Can you fix applib.fsx? It doesn't seem to know what fsi is, or parseArgs. I think it's missing some dependencies
 (think think code checkin)
 // Now I've got that same fsi problem over in app and app-test, starting with line 34. Neither one of them also seem to know what the parseArgs function is, which should be in the included applib.fsx file. Also neither app.fsx or app-test.fsx seem to know what a StreamReader is, which is really strange. Can you fix that?
-
+// When I run  cat sample.txt | ./app from bash I get app.fsx(40,43): error FS0039: The value or constructor 'parseArgs' is not defined.
+(think think code)

@@ -2,7 +2,7 @@
 
 open System
 open System.IO
-open Microsoft.FSharp.Compiler.Interactive.Settings
+open Microsoft.FSharp.Compiler.Interactive.Shell.Settings
 
 let helpText = """
 Usage: app [options]

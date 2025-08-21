@@ -1,4 +1,5 @@
 #load "applib.fsx"
+#r "FSharp.Compiler.Service.dll"
 
 open System
 open System.IO
