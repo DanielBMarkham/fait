@@ -21,11 +21,21 @@ cat sample.txt | ./app-test --v INFO --h | ./app --v INFO --h
 
 ```dos
 
-type test.txt | part2
-type test.txt | part2-test
+type sample.txt | app
+type sample.txt | app-test
 
-part2
-part2-test
+app
+app-test
+
+type sample.txt | app | app-test
+type sample.txt | app-test | app
+
+type sample.txt | app --v INFO --h
+type sample.txt | app-test --v INFO --h
+
+
+type sample.txt | app --v INFO --h | app-test --v INFO --h
+type sample.txt | app-test --v INFO --h | app --v INFO --h
 
 
 ```
