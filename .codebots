@@ -34,3 +34,6 @@ In adition to all of this, if you can provide any of this also as an executable 
 (think think code checkin)
 // Hey grok, I think you screwed that up. The compiler doesn't understand what verbosity means in the app.fsx like on line 23. That looks like a scoping issue. In fact, since we want both of these scripts to have the same exterior interface, let's move all of that common code, the options, logging, and whatnot to another file. Let's call it applib
 (think think think code checkin)
+// Can you fix applib.fsx? It doesn't seem to know what fsi is, or parseArgs. I think it's missing some dependencies
+(think think code checkin)
+
