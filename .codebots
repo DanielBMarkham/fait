@@ -31,3 +31,6 @@ In adition to all of this, if you can provide any of this also as an executable 
 // Smoke tests run. Can you add in a --dt option that puts a high precision UTC datetime at the beginning of any log message?
 (think think think code checkin)
 // Looks good. I think this is the final big architectural request for a while. Both of these scripts have a pure functional heart, it's processData. I'd like to lift both of these processDatas out of the scripts and put into one library, let's call it applib. Since they have the same name, we'll need to rename them processAppData for the app.fsx script and processAppTestData for the app-test script. Each also has dependencies that need to be lifted out and renamed appropriately. This will allow both the app and app-test scripts to use the same library and also for the heart of the code to be reused by other applications
+(think think code checkin)
+// Hey grok, I think you screwed that up. The compiler doesn't understand what verbosity means in the app.fsx like on line 23. That looks like a scoping issue. In fact, since we want both of these scripts to have the same exterior interface, let's move all of that common code, the options, logging, and whatnot to another file. Let's call it applib
+(think think think code checkin)
