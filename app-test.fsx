@@ -44,7 +44,7 @@ If no input is provided, it reads from stdin, which may appear as hanging if wai
 let main () =
     let args = 
         try
-            fsi.CommandLineArgs |> Array.tail
+            Environment.GetCommandLineArgs() |> Array.skip 3
         with
         | _ -> [||]
     let inputFile, outputFile, showHelp = parseArgs args
