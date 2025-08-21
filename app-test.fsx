@@ -1,55 +1,12 @@
+#load "applib.fsx"
+
 open System
 open System.IO
 
-type LogLevel =
-    | Info = 1
-    | Warn = 2
-    | Error = 3
-
-let mutable verbosity = LogLevel.Error
-let mutable addDatetime = false
-
-let log (level: LogLevel) (msg: string) =
-    let prefix = if addDatetime then DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + " " else ""
-    if (int level) >= (int verbosity) then
-        Console.Error.WriteLine (prefix + msg)
-
-let reverseWords (cluster: string) : string =
-    if String.IsNullOrEmpty cluster then ""
-    else
-        cluster.Split([|' '|], StringSplitOptions.None)
-        |> Array.rev
-        |> String.concat " "
-
-let processRow (fields: string[]) : string[] =
-    if verbosity = LogLevel.Info then log LogLevel.Info "Entering processRow"
-    let result = 
-        fields 
-        |> Array.rev 
-        |> Array.map reverseWords
-    if verbosity = LogLevel.Info then log LogLevel.Info "Exiting processRow"
-    result
-
-let processData (data: string[][]) : string[][] =
-    if verbosity = LogLevel.Info then log LogLevel.Info "Entering processData"
-    let result = data |> Array.map processRow
-    if verbosity = LogLevel.Info then log LogLevel.Info "Exiting processData"
-    result
-
-let arraysEqual (a1: string[]) (a2: string[]) =
-    if a1.Length <> a2.Length then false
-    else
-        Seq.zip a1 a2 |> Seq.forall (fun (x, y) -> x = y)
-
-let jaggedEqual (d1: string[][]) (d2: string[][]) =
-    if d1.Length <> d2.Length then false
-    else
-        Seq.zip d1 d2 |> Seq.forall (fun (r1, r2) -> arraysEqual r1 r2)
-
 let runSmokeTests () =
     let test (name: string) (input: string[][]) (expected: string[][]) =
-        let output = processData input
-        let pass = jaggedEqual output expected
+        let output = processAppTestData input
+        let pass = appTestJaggedEqual output expected
         log LogLevel.Warn (sprintf "Smoke test %s: %s" name (if pass then "PASS" else "FAIL"))
     test "1 - Empty" [||] [||]
     test "2 - Single empty row" [| [||] |] [| [||] |]
@@ -151,7 +108,7 @@ let main () =
             let mutable line = reader.ReadLine()
             while line <> null do
                 let fields = line.Split '\t'
-                let processed = processRow fields
+                let processed = processAppTestRow fields
                 let outLine = String.Join("\t", processed)
                 writer.WriteLine outLine
                 line <- reader.ReadLine()

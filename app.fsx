@@ -1,40 +1,7 @@
+#load "applib.fsx"
+
 open System
 open System.IO
-
-type LogLevel =
-    | Info = 1
-    | Warn = 2
-    | Error = 3
-
-let mutable verbosity = LogLevel.Error
-let mutable addDatetime = false
-
-let log (level: LogLevel) (msg: string) =
-    let prefix = if addDatetime then DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + " " else ""
-    if (int level) >= (int verbosity) then
-        Console.Error.WriteLine (prefix + msg)
-
-let reverseWords (cluster: string) : string =
-    if String.IsNullOrEmpty cluster then ""
-    else
-        cluster.Split([|' '|], StringSplitOptions.None)
-        |> Array.rev
-        |> String.concat " "
-
-let processRow (fields: string[]) : string[] =
-    if verbosity = LogLevel.Info then log LogLevel.Info "Entering processRow"
-    let result = 
-        fields 
-        |> Array.rev 
-        |> Array.map reverseWords
-    if verbosity = LogLevel.Info then log LogLevel.Info "Exiting processRow"
-    result
-
-let processData (data: string[][]) : string[][] =
-    if verbosity = LogLevel.Info then log LogLevel.Info "Entering processData"
-    let result = data |> Array.map processRow
-    if verbosity = LogLevel.Info then log LogLevel.Info "Exiting processData"
-    result
 
 let parseArgs (args: string[]) =
     let mutable inputFile = None
@@ -127,7 +94,7 @@ let main () =
             let mutable line = reader.ReadLine()
             while line <> null do
                 let fields = line.Split '\t'
-                let processed = processRow fields
+                let processed = processAppRow fields
                 let outLine = String.Join("\t", processed)
                 writer.WriteLine outLine
                 line <- reader.ReadLine()
