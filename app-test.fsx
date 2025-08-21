@@ -7,10 +7,12 @@ type LogLevel =
     | Error = 3
 
 let mutable verbosity = LogLevel.Error
+let mutable addDatetime = false
 
 let log (level: LogLevel) (msg: string) =
+    let prefix = if addDatetime then DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + " " else ""
     if (int level) >= (int verbosity) then
-        Console.Error.WriteLine msg
+        Console.Error.WriteLine (prefix + msg)
 
 let reverseWords (cluster: string) : string =
     if String.IsNullOrEmpty cluster then ""
@@ -79,6 +81,8 @@ let parseArgs (args: string[]) =
                 | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
         elif arg = "--h" then
             showHelp <- true
+        elif arg = "--dt" then
+            addDatetime <- true
         else
             log LogLevel.Error (sprintf "Unknown option: %s" arg)
         i <- i + 1
@@ -91,6 +95,7 @@ Options:
   --i <file>   Input file (default: stdin)
   --o <file>   Output file (default: stdout)
   --v <level>  Verbosity level: INFO, WARN, ERROR (default: ERROR)
+  --dt         Enable high precision UTC datetime prefix on log messages
   --h          Show this help
 
 This program reads tab-delimited text, processes it by reversing the order of clusters in each line and reversing the words in each cluster, and outputs the result.

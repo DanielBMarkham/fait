@@ -28,3 +28,5 @@ In adition to all of this, if you can provide any of this also as an executable 
 (think code checkin)
 // I need you to make the command line options double dash instead of single dash, ie --h instead of -h. Otherwise the options keep escaping the script and end up being processed by dotnet. Be sure to fix both files
 (think think code checkin)
+// Smoke tests run. Can you add in a --dt option that puts a high precision UTC datetime at the beginning of any log message?
+(think think think code checkin)
