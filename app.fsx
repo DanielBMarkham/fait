@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open Microsoft.FSharp.Compiler.Interactive.Settings
 
 let helpText = """
 Usage: app [options]
@@ -30,10 +31,11 @@ If no input is provided, it reads from stdin, which may appear as hanging if wai
 
 let main () =
     let args = 
-        try
-            Environment.GetCommandLineArgs() |> Array.skip 3
-        with
-        | _ -> [||]
+        #if INTERACTIVE
+        fsi.CommandLineArgs |> Array.tail
+        #else
+        Environment.GetCommandLineArgs() |> Array.tail
+        #endif
     let inputFile, outputFile, showHelp = parseArgs args
     if showHelp then
         Console.Out.WriteLine helpText
