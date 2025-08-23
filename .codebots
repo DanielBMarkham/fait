@@ -43,3 +43,5 @@ In adition to all of this, if you can provide any of this also as an executable 
 (think think code checkin)
 // Now it's back again. From bash when I run cat sample.txt | ./app I get app.fsx(39,43): error FS0039: The value or constructor 'parseArgs' is not defined.
 (think think code checkin)
+// That looks real nice, Grok. Let's do a bit more cleanup in anticipation of making this into a templaed project folder for Visual Studio. First, right now we're using tabs for delimiters. I'd like to be able to default to tabs, but add a --delim command line option to take any regex string and use it. We're also using that sample.txt file, let's rename that to appsample.txt in order to keep with the idea that app will be a generic name and we'll replace it all later with the actual name of the project once its instantiated. Be sure to update the help along with providing a usage example. 
+(think think think code)
