@@ -1,3 +1,5 @@
+module Applib
+
 open System
 
 type LogLevel =

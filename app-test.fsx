@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 open Microsoft.FSharp.Compiler.Interactive.Settings
+open Applib
 
 let runSmokeTests () =
     let test (name: string) (input: string[][]) (expected: string[][]) =
@@ -82,10 +83,11 @@ If no input is provided, it reads from stdin, which may appear as hanging if wai
 
 let main () =
     let args = 
-        try
-            fsi.CommandLineArgs |> Array.tail
-        with
-        | _ -> [||]
+        #if INTERACTIVE
+        fsi.CommandLineArgs |> Array.tail
+        #else
+        Environment.GetCommandLineArgs() |> Array.tail
+        #endif
     let inputFile, outputFile, showHelp, delim = parseArgs args
     if showHelp then
         Console.Out.WriteLine helpText
