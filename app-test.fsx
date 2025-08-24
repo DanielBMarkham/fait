@@ -3,6 +3,7 @@
 open System
 open System.IO
 open System.Text.RegularExpressions
+open System.Diagnostics
 open Microsoft.FSharp.Compiler.Interactive.Settings
 open Applib
 
@@ -17,6 +18,22 @@ let runSmokeTests () =
     test "4 - Row with words" [| [|"hello world"|] |] [| [|"world hello"|] |]
     test "5 - Multiple fields" [| [|"a b"; "c d e"|] |] [| [|"e d c"; "b a"|] |]
     test "6 - With hole (intentional fail)" [| [|"x"; ""; "y"|] |] [| [|"y"; ""; "z"|] |]  // Expected 'z' instead of 'x' to force fail
+    // Test 7 - Command execution
+    let isUnix = Environment.OSVersion.Platform = PlatformID.Unix
+    let cmd, args =
+        if isUnix then
+            "bash", "-c \"cat appsample.txt | ./app\""
+        else
+            "cmd", "/c \"type appsample.txt | app.cmd\""
+    let procStartInfo = ProcessStartInfo(cmd, args)
+    use proc = new Process(StartInfo = procStartInfo)
+    let started = proc.Start()
+    let pass =
+        if not started then false
+        else
+            proc.WaitForExit()
+            proc.ExitCode = 0
+    log LogLevel.Warn (sprintf "Smoke test 7 - Command execution: %s" (if pass then "PASS" else "FAIL"))
 
 let parseArgs (args: string[]) =
     let mutable inputFile = None
@@ -41,7 +58,7 @@ let parseArgs (args: string[]) =
                 | "ERROR" -> verbosity <- LogLevel.Error
                 | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
         elif arg = "--h" then
-            showHelp <- true
+            showHelp = true
         elif arg = "--dt" then
             addDatetime <- true
         elif arg = "--delim" then

@@ -29,7 +29,7 @@ let parseArgs (args: string[]) =
                 | "ERROR" -> verbosity <- LogLevel.Error
                 | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
         elif arg = "--h" then
-            showHelp <- true
+            showHelp = true
         elif arg = "--dt" then
             addDatetime <- true
         elif arg = "--delim" then
