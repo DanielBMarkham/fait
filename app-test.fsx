@@ -34,6 +34,22 @@ let runSmokeTests () =
             proc.WaitForExit()
             proc.ExitCode = 0
     Applib.log LogLevel.Warn (sprintf "Smoke test 7 - Command execution: %s" (if pass then "PASS" else "FAIL"))
+    // Test 8 - Command execution
+    let isUnix = Environment.OSVersion.Platform = PlatformID.Unix
+    let cmd, args =
+        if isUnix then
+            "bash", "-c \"cat appsample.txt | ./app-test\""
+        else
+            "cmd", "/c \"type appsample.txt | app-test\""
+    let procStartInfo = ProcessStartInfo(cmd, args)
+    use proc = new Process(StartInfo = procStartInfo)
+    let started = proc.Start()
+    let pass =
+        if not started then false
+        else
+            proc.WaitForExit()
+            proc.ExitCode = 0
+    Applib.log LogLevel.Warn (sprintf "Smoke test 8 - Command execution: %s" (if pass then "PASS" else "FAIL"))
 
 let parseArgs (args: string[]) =
     let mutable inputFile = None
