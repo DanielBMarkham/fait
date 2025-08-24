@@ -9,9 +9,9 @@ open Applib
 
 let runSmokeTests () =
     let test (name: string) (input: string[][]) (expected: string[][]) =
-        let output = processAppTestData input
-        let pass = appTestJaggedEqual output expected
-        log LogLevel.Warn (sprintf "Smoke test %s: %s" name (if pass then "PASS" else "FAIL"))
+        let output = Applib.processAppTestData input
+        let pass = Applib.appTestJaggedEqual output expected
+        Applib.log LogLevel.Warn (sprintf "Smoke test %s: %s" name (if pass then "PASS" else "FAIL"))
     test "1 - Empty" [||] [||]
     test "2 - Single empty row" [| [||] |] [| [||] |]
     test "3 - Row with empty field" [| [|""|] |] [| [|""|] |]
@@ -33,7 +33,7 @@ let runSmokeTests () =
         else
             proc.WaitForExit()
             proc.ExitCode = 0
-    log LogLevel.Warn (sprintf "Smoke test 7 - Command execution: %s" (if pass then "PASS" else "FAIL"))
+    Applib.log LogLevel.Warn (sprintf "Smoke test 7 - Command execution: %s" (if pass then "PASS" else "FAIL"))
 
 let parseArgs (args: string[]) =
     let mutable inputFile = None
@@ -53,19 +53,19 @@ let parseArgs (args: string[]) =
             i <- i + 1
             if i < args.Length then
                 match args.[i].ToUpper() with
-                | "INFO" -> verbosity <- LogLevel.Info
-                | "WARN" -> verbosity <- LogLevel.Warn
-                | "ERROR" -> verbosity <- LogLevel.Error
-                | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
+                | "INFO" -> Applib.verbosity <- LogLevel.Info
+                | "WARN" -> Applib.verbosity <- LogLevel.Warn
+                | "ERROR" -> Applib.verbosity <- LogLevel.Error
+                | _ -> Applib.log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
         elif arg = "--h" then
-            showHelp = true
+            showHelp <- true
         elif arg = "--dt" then
-            addDatetime <- true
+            Applib.addDatetime <- true
         elif arg = "--delim" then
             i <- i + 1
             if i < args.Length then delim <- args.[i]
         else
-            log LogLevel.Error (sprintf "Unknown option: %s" arg)
+            Applib.log LogLevel.Error (sprintf "Unknown option: %s" arg)
         i <- i + 1
     (inputFile, outputFile, showHelp, delim)
 
@@ -116,7 +116,7 @@ let main () =
                 new StreamReader(file)
             with
             | ex ->
-                log LogLevel.Error (sprintf "Error opening input file %s: %s. Falling back to stdin." file ex.Message)
+                Applib.log LogLevel.Error (sprintf "Error opening input file %s: %s. Falling back to stdin." file ex.Message)
                 Console.In
         | None ->
             Console.In
@@ -127,7 +127,7 @@ let main () =
                 new StreamWriter(file)
             with
             | ex ->
-                log LogLevel.Error (sprintf "Error opening output file %s: %s. Falling back to stdout." file ex.Message)
+                Applib.log LogLevel.Error (sprintf "Error opening output file %s: %s. Falling back to stdout." file ex.Message)
                 Console.Out
         | None ->
             Console.Out
@@ -136,13 +136,13 @@ let main () =
             let mutable line = reader.ReadLine()
             while line <> null do
                 let fields = Regex.Split(line, delim)
-                let processed = processAppTestRow fields
+                let processed = Applib.processAppTestRow fields
                 let outLine = String.Join("\t", processed)
                 writer.WriteLine outLine
                 line <- reader.ReadLine()
         with
         | ex ->
-            log LogLevel.Error (sprintf "Error during processing: %s" ex.Message)
+            Applib.log LogLevel.Error (sprintf "Error during processing: %s" ex.Message)
     finally
         if reader <> Console.In then reader.Close()
         if writer <> Console.Out then writer.Close()

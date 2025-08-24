@@ -24,19 +24,19 @@ let parseArgs (args: string[]) =
             i <- i + 1
             if i < args.Length then
                 match args.[i].ToUpper() with
-                | "INFO" -> verbosity <- LogLevel.Info
-                | "WARN" -> verbosity <- LogLevel.Warn
-                | "ERROR" -> verbosity <- LogLevel.Error
-                | _ -> log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
+                | "INFO" -> Applib.verbosity <- LogLevel.Info
+                | "WARN" -> Applib.verbosity <- LogLevel.Warn
+                | "ERROR" -> Applib.verbosity <- LogLevel.Error
+                | _ -> Applib.log LogLevel.Error (sprintf "Invalid verbosity level: %s" args.[i])
         elif arg = "--h" then
-            showHelp = true
+            showHelp <- true
         elif arg = "--dt" then
-            addDatetime <- true
+            Applib.addDatetime <- true
         elif arg = "--delim" then
             i <- i + 1
             if i < args.Length then delim <- args.[i]
         else
-            log LogLevel.Error (sprintf "Unknown option: %s" arg)
+            Applib.log LogLevel.Error (sprintf "Unknown option: %s" arg)
         i <- i + 1
     (inputFile, outputFile, showHelp, delim)
 
@@ -85,7 +85,7 @@ let main () =
                 new StreamReader(file)
             with
             | ex ->
-                log LogLevel.Error (sprintf "Error opening input file %s: %s. Falling back to stdin." file ex.Message)
+                Applib.log LogLevel.Error (sprintf "Error opening input file %s: %s. Falling back to stdin." file ex.Message)
                 Console.In
         | None ->
             Console.In
@@ -96,7 +96,7 @@ let main () =
                 new StreamWriter(file)
             with
             | ex ->
-                log LogLevel.Error (sprintf "Error opening output file %s: %s. Falling back to stdout." file ex.Message)
+                Applib.log LogLevel.Error (sprintf "Error opening output file %s: %s. Falling back to stdout." file ex.Message)
                 Console.Out
         | None ->
             Console.Out
@@ -105,13 +105,13 @@ let main () =
             let mutable line = reader.ReadLine()
             while line <> null do
                 let fields = Regex.Split(line, delim)
-                let processed = processAppRow fields
+                let processed = Applib.processAppRow fields
                 let outLine = String.Join("\t", processed)
                 writer.WriteLine outLine
                 line <- reader.ReadLine()
         with
         | ex ->
-            log LogLevel.Error (sprintf "Error during processing: %s" ex.Message)
+            Applib.log LogLevel.Error (sprintf "Error during processing: %s" ex.Message)
     finally
         if reader <> Console.In then reader.Close()
         if writer <> Console.Out then writer.Close()
