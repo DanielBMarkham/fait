@@ -55,3 +55,8 @@ In adition to all of this, if you can provide any of this also as an executable 
 cat appsample.txt | ./app-test  type appsample.txt | app-test
 (think think think code NO CHECKIN HOSED)
 // note: we've started giving out code that escapes the code block. We're also hard-coding numbers into our smoke tests, ie ,smoketest7, smoketest8, etc -- instead of just continuing the array. I'll try to grab this last test and add it, but I think grok's a bit tired now. Might need to hang it up
+// Ok, I fixed it, but that dang smoke test function went from being a thing of beauty to a mess. I get the feeling that since there's no intelligence here, it's all just managed chaos under the hood. The scary part is that it's not apparent unless you're really really careful
+
+// can't think of anything else right now...
+// I have a generic folder command line application written in F# that runs in multiple Operating Systems. What's the best way to make that into a template I can reuse, make it into a VS Studio Project? Simply make a template folder then copy it over and do a search replace? It'd be nice to have something that wouldn't rely on any external tools aside from the OS  
+
