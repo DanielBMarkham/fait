@@ -37,5 +37,8 @@ type appsample.txt | app-test --v INFO --h
 type appsample.txt | app --v INFO --h | app-test --v INFO --h
 type appsample.txt | app-test --v INFO --h | app --v INFO --h
 
+dotnet fsi myapp.fsx -h
+myapp.sh
 
-```
+//```Bill Baily
+// untamed war of the worlds

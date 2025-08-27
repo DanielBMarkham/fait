@@ -1,0 +1,176 @@
+00c44e6 Seems like a good stopping place for round 3
+5	0	.codebots
+eff41c5 I think we're done with round 3. Grok did great
+4	0	.codebots
+16	0	app-test.fsx
+102560a more grok loinsg the dependency plot again
+4	1	.codebots
+15	15	app-test.fsx
+11	11	app.fsx
+b00f146 Began to see if grok could replicate my command line smoke tests as well
+3	0	.codebots
+18	1	app-test.fsx
+1	1	app.fsx
+80f29cf It lost a dependency reference again but we fixed it
+6	4	app-test.fsx
+6	4	app.fsx
+2	0	applib.fsx
+16	16	human-smoke-tests.md
+5ea2fd3 checked in havent looked at it
+2	0	.codebots
+49	13	app-test.fsx
+49	13	app.fsx
+0	30	applib.fsx
+0	0	sample.txt => appsample.txt
+824747a I think I got grok to heal itself
+3	2	.codebots
+1	1	app-test.fsx
+2	1	app.fsx
+59	1	applib.fsx
+8a15e79 more errors
+4	1	.codebots
+a9f6cf8 ok
+2	1	.codebots
+1	0	app-test.fsx
+1	1	app.fsx
+1	59	applib.fsx
+bed72c7 grok can fix anything, but no
+6	4	app-test.fsx
+6	4	app.fsx
+ea8198f forgot to paste
+1	0	.codebots
+1	1	app-test.fsx
+1	1	app.fsx
+4941358 grok grok, my favorite idiot savant
+4	1	.codebots
+888da5f trying to refactor commonalities
+4	1	.codebots
+0	30	app-test.fsx
+0	30	app.fsx
+30	0	applib.fsx
+fb2f1ca in which grok didn't lift band shift very well
+1	0	.codebots
+5	48	app-test.fsx
+3	36	app.fsx
+68	0	applib.fsx
+fd2c4e6 added a dt option for datetime
+2	0	.codebots
+6	1	app-test.fsx
+6	1	app.fsx
+fae13b8 smoke tests pass! Yay!
+1	0	app-test
+14	4	human-smoke-tests.md
+a6248eb began to update human smok,e tests
+15	4	human-smoke-tests.md
+c6dd139 grok grok Fixed another one for you
+4	1	.codebots
+11	11	app-test.fsx
+11	11	app.fsx
+4d2b0da First prompt done. I'll play around some more with the innards later
+5	0	.codebots
+2	0	app
+2	0	app-test.cmd
+160	0	app-test.fsx
+2	0	app.cmd
+136	0	app.fsx
+0	0	part3-tests.fsx
+0	0	part3.fsx
+100	0	sample.txt
+be5807c More setting up for round 3
+20	0	.codebots
+0	0	sample.txt
+ce327ef Added some new empty files for another go around sometime this week
+2	0	.codebots
+0	0	part3-tests.fsx
+0	0	part3.fsx
+0	0	prompt-history2.md
+f578726 and we go again
+100	98	part2-test.fsx
+38	36	part2.fsx
+36	0	prompthistory.md
+30c18ac I may have to put grok on an employee improvement program
+100	0	output.txt
+1	0	prompthistory.md
+e36d956 grok fixes quickly
+15	14	part2-test.fsx
+52	159	part2.fsx
+32	0	prompthistory.md
+319a3c4 giving grok feedback
+5	0	prompthistory.md
+9bb2b8c updated readme
+2	0	README.md
+ff9c0f1 Here grok, let me fix your code for you. You got the indents wrong
+17	17	part2-test.fsx
+160	52	part2.fsx
+18bb6b5 looks great doesn't work
+0	0	output.txt
+7	0	prompthistory.md
+8a50d7c Grok did someting. I'm falling way behind in smoke testing
+1	1	part2-test.cmd
+1	1	part2.cmd
+13	0	prompthistory.md
+23ab5ef Am I making progress? More code is being written. Is that a yes?
+84	38	part2-test.fsx
+48	15	part2.fsx
+20	0	prompthistory.md
+556b6ca now I don't know if the dang smoke test is working or not!
+7	0	human-smoke-tests.md
+fa0f926 grok tries again
+24	23	part2-test.fsx
+15	0	prompthistory.md
+a68be6f going to have to get good at smoke testing. grok is sneaky
+3	0	human-smoke-tests.md
+2	0	prompthistory.md
+9af254b beginning to formallize the human part of the smoke tests
+10	0	human-smoke-tests.md
+3	0	part2
+3	0	part2-test
+0f6c779 and again we go around the wheel
+9	9	part2-test.fsx
+0	1	part2.fsx
+12	0	prompthistory.md
+e88266a dang grok we're back to this, huh
+6	0	prompthistory.md
+f2b10a8 twiddles thumbs
+77	17	part2-test.fsx
+51	31	part2.fsx
+44	0	prompthistory.md
+7d5e58c stil trying to make progress
+2	0	prompthistory.md
+8e2f080 continuing to smoke test grok and vibe coding
+94	67	part1.fsx
+122	52	part2-test.fsx
+15	1	prompthistory.md
+3d608e1 still working on getting grok to code for basic exception and code calling conditions
+1	0	part2-test.cmd
+1	0	part2.cmd
+9	0	prompthistory.md
+a14f453 poking
+4	0	prompthistory.md
+42f4257 continuing to look great but not working the way I wanted it to
+66	0	part2-test.fsx
+13	1	part2.fsx
+29	0	prompthistory.md
+017fa59 start over with framework
+74	0	part2.fsx
+58	0	prompthistory.md
+12a4a4f grok morphed the architecture to the point of needing a rewrite
+60	27	part1.fsx
+3	0	prompthistory.md
+cbf7964 Added in my prompt history to remember the conversation better
+24	0	prompthistory.md
+58a36ab Asked Grok to rearchitect it a bit in order to be used in multiple deployment contexts
+27	22	part1.fsx
+fdda5a0 OS Safety checks now in place
+35	23	part1.fsx
+715d7cb Initial function without OS failsafes
+2	1	.gitignore
+28	0	part1.fsx
+04e88ac Update project goals
+6	0	README.md
+d33ca7c added first test input
+100	0	test.txt
+460bccd Initial commit
+54	0	.gitignore
+21	0	LICENSE
+2	0	README.md
