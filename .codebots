@@ -31,3 +31,6 @@ These two scripts are expected to be used as a dotnet project template for futur
 
 (think think think code)
 // Now when I type in cat appsample.txt | ./app2 I get app2.fsx(161,13): error FS0001: All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is 'TextWriter'. This branch returns a value of type 'StreamWriter'.
+
+(think think think code)
+// Now when I type in cat appsample.txt | ./app2 I get app2.fsx(167,19): error FS0003: This value is not a function and cannot be applied. Also you don't need to upcast on line 161 that gets a warning. (also looks a lot like hacking)
