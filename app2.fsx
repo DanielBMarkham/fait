@@ -159,36 +159,33 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
             new StreamWriter(file)
         | None ->
             Console.Out :> TextWriter
-    let isFileOutput = outputFile.IsSome
-    try
-        use outputWriter = writer
-        if inputFile.IsSome then
-            // Stream from file
+    use outputWriter = writer
+    if inputFile.IsSome then
+        try
             use reader = File.OpenText(inputFile.Value)
             let mutable line = reader.ReadLine()
             while not isNull line do
                 let processedLine = processLine line delim
                 outputWriter.WriteLine(processedLine)
                 line <- reader.ReadLine()
-        else
-            // Stream from stdin (interactive or piped)
+        with
+        | :? FileNotFoundException as ex ->
+            logMsg userLevel useDt Error $"Input file not found: {inputFile.Value}. Error: {ex.Message}"
+        | :? IOException as ex ->
+            logMsg userLevel useDt Error $"I/O error: {ex.Message}"
+        | ex ->
+            logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+    else
+        try
             let mutable line = Console.ReadLine()
             while not isNull line do
                 let processedLine = processLine line delim
                 outputWriter.WriteLine(processedLine)
                 line <- Console.ReadLine()
-        if userLevel = Info then logMsg userLevel useDt Info "Finished line-by-line processing."
-    with
-    | :? FileNotFoundException as ex ->
-        logMsg userLevel useDt Error $"Input file not found: {inputFile.Value}. Error: {ex.Message}"
-    | :? IOException as ex ->
-        logMsg userLevel useDt Error $"I/O error: {ex.Message}"
-    | ex ->
-        logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
-    finally
-        if isFileOutput then
-            (writer :?> StreamWriter).Flush()
-            (writer :?> StreamWriter).Dispose()
+        with
+        | ex ->
+            logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+    if userLevel = Info then logMsg userLevel useDt Info "Finished line-by-line processing."
 
 /// Entry point.
 [<EntryPoint>]
