@@ -28,3 +28,6 @@ These two scripts are expected to be used as a dotnet project template for futur
 // Gosh grok, when I type in my first test it doesn't work. I type in cat appsample.txt | ./app2 and I get app2.fsx(123,47): error FS3373: Invalid interpolated string. Single quote or verbatim string literals may not be used in interpolated expressions in single quote or verbatim strings. Consider using an explicit 'let' binding for the interpolation expression or use a triple quote string as the outer string literal.
 
 // Now when I type in cat appsample.txt | ./app2 I get app2.fsx(188,5): error FS0010: Unexpected keyword 'finally' in binding. Expected incomplete structured construct at or before this point or other token. F# does not support using both with and finally. You'll need something nested. How about putting a try-finally outside and then put a try-with on the inside
+
+(think think think code)
+// Now when I type in cat appsample.txt | ./app2 I get app2.fsx(161,13): error FS0001: All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is 'TextWriter'. This branch returns a value of type 'StreamWriter'.
