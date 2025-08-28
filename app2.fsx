@@ -83,7 +83,7 @@ let printHelp (appName: string) : unit =
     Console.WriteLine("  --v, --verbosity <LEVEL>  Set verbosity: INFO (all logs), WARN (default, warnings and errors), ERROR (only errors).")
     Console.WriteLine("  --i, --input <FILE>  Read input from FILE instead of stdin.")
     Console.WriteLine("  --o, --output <FILE> Write output to FILE instead of stdout.")
-    Console.WriteLine("  --d, --delim <REGEX> Use REGEX as column delimiter (default: \\t).")
+    Console.WriteLine("  --d, --delim <REGEX> Use REGEX as column delimiter (default: \t).")
     Console.WriteLine("  --t, --tests        Run smoke tests instead of normal operation.")
     Console.WriteLine("  --dt, --datetime    Prefix log messages with high-precision datetime.")
     Console.WriteLine("")
@@ -191,10 +191,10 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
             with
             | :? IOException as ex ->
                 logMsg userLevel useDt Error $"Output I/O error: {ex.Message}"
-                0
+                false
             | ex ->
                 logMsg userLevel useDt Error $"Unexpected error during output setup: {ex.Message}"
-                0
+                false
         else
             if inputFile.IsSome then
                 try
