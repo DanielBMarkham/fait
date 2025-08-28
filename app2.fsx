@@ -156,7 +156,7 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
     let writer =
         match outputFile with
         | Some file ->
-            new StreamWriter(file)
+            new StreamWriter(file) :> TextWriter
         | None ->
             Console.Out :> TextWriter
     use outputWriter = writer
