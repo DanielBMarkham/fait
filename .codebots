@@ -36,3 +36,8 @@ These two scripts are expected to be used as a dotnet project template for futur
 // Now when I type in cat appsample.txt | ./app2 I get app2.fsx(167,19): error FS0003: This value is not a function and cannot be applied. Also you don't need to upcast on line 161 that gets a warning. (also looks a lot like hacking)
 
 (think think think code)
+
+// Now it's app2.fsx(194,17): error FS0001: This expression was expected to have type
+    'bool'
+but here has type
+    'int'
