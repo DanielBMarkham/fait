@@ -34,7 +34,7 @@ let parseArgs (args: string[]) : bool * LogLevel * string option * string option
     let mutable verbosity = Warn  // Default
     let mutable inputFile = None
     let mutable outputFile = None
-    let mutable delim = @"\t"  // Default tab regex
+    let mutable delim = "\t"  // Default tab character
     let mutable runTests = false
     let mutable useDatetime = false
 
@@ -150,42 +150,85 @@ let printExternalTests (appName: string) (userLevel: LogLevel) (useDt: bool) : u
     Console.WriteLine("   BASH/DOS: app2 --h  (should print help without processing)")
 
 /// Main processing logic: reads input (file or stdin), processes line-by-line, writes output (file or stdout).
-/// Streams data without loading entire input at once.
-let processInput (inputFile: string option) (outputFile: string option) (delim: string) (processLine: string -> string -> string) (userLevel: LogLevel) (useDt: bool) : unit =
+/// Streams data without loading entire input at once. Returns 0 on success, 1 on error.
+let processInput (inputFile: string option) (outputFile: string option) (delim: string) (processLine: string -> string -> string) (userLevel: LogLevel) (useDt: bool) : int =
     if userLevel = Info then logMsg userLevel useDt Info "Starting line-by-line processing."
-    let writer =
-        match outputFile with
-        | Some file ->
-            new StreamWriter(file) :> TextWriter
-        | None ->
-            Console.Out :> TextWriter
-    use outputWriter = writer
-    if inputFile.IsSome then
-        try
-            use reader = File.OpenText(inputFile.Value)
-            let mutable line = reader.ReadLine()
-            while not isNull line do
-                let processedLine = processLine line delim
-                outputWriter.WriteLine(processedLine)
-                line <- reader.ReadLine()
-        with
-        | :? FileNotFoundException as ex ->
-            logMsg userLevel useDt Error $"Input file not found: {inputFile.Value}. Error: {ex.Message}"
-        | :? IOException as ex ->
-            logMsg userLevel useDt Error $"I/O error: {ex.Message}"
-        | ex ->
-            logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
-    else
-        try
-            let mutable line = Console.ReadLine()
-            while not isNull line do
-                let processedLine = processLine line delim
-                outputWriter.WriteLine(processedLine)
-                line <- Console.ReadLine()
-        with
-        | ex ->
-            logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+    let success = 
+        if outputFile.IsSome then
+            try
+                use outputWriter = new StreamWriter(outputFile.Value)
+                if inputFile.IsSome then
+                    try
+                        use reader = File.OpenText(inputFile.Value)
+                        let mutable line = reader.ReadLine()
+                        while line <> null do
+                            let processedLine = processLine line delim
+                            outputWriter.WriteLine(processedLine)
+                            line <- reader.ReadLine()
+                        true
+                    with
+                    | :? FileNotFoundException as ex ->
+                        logMsg userLevel useDt Error $"Input file not found: {inputFile.Value}. Error: {ex.Message}"
+                        false
+                    | :? IOException as ex ->
+                        logMsg userLevel useDt Error $"I/O error: {ex.Message}"
+                        false
+                    | ex ->
+                        logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+                        false
+                else
+                    try
+                        let mutable line = Console.ReadLine()
+                        while line <> null do
+                            let processedLine = processLine line delim
+                            outputWriter.WriteLine(processedLine)
+                            line <- Console.ReadLine()
+                        true
+                    with
+                    | ex ->
+                        logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+                        false
+            with
+            | :? IOException as ex ->
+                logMsg userLevel useDt Error $"Output I/O error: {ex.Message}"
+                0
+            | ex ->
+                logMsg userLevel useDt Error $"Unexpected error during output setup: {ex.Message}"
+                0
+        else
+            if inputFile.IsSome then
+                try
+                    use reader = File.OpenText(inputFile.Value)
+                    let mutable line = reader.ReadLine()
+                    while line <> null do
+                        let processedLine = processLine line delim
+                        Console.Out.WriteLine(processedLine)
+                        line <- reader.ReadLine()
+                    true
+                with
+                | :? FileNotFoundException as ex ->
+                    logMsg userLevel useDt Error $"Input file not found: {inputFile.Value}. Error: {ex.Message}"
+                    false
+                | :? IOException as ex ->
+                    logMsg userLevel useDt Error $"I/O error: {ex.Message}"
+                    false
+                | ex ->
+                    logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+                    false
+            else
+                try
+                    let mutable line = Console.ReadLine()
+                    while line <> null do
+                        let processedLine = processLine line delim
+                        Console.Out.WriteLine(processedLine)
+                        line <- Console.ReadLine()
+                    true
+                with
+                | ex ->
+                    logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
+                    false
     if userLevel = Info then logMsg userLevel useDt Info "Finished line-by-line processing."
+    if success then 0 else 1
 
 /// Entry point.
 [<EntryPoint>]
@@ -202,7 +245,6 @@ let main argv =
             0
         else
             processInput inputFile outputFile delim processAppDataLine userLevel useDt
-            0
     with
     | ex ->
         // Catch any top-level exception, log, and exit safely (no throw to OS).

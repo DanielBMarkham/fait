@@ -34,3 +34,5 @@ These two scripts are expected to be used as a dotnet project template for futur
 
 (think think think code)
 // Now when I type in cat appsample.txt | ./app2 I get app2.fsx(167,19): error FS0003: This value is not a function and cannot be applied. Also you don't need to upcast on line 161 that gets a warning. (also looks a lot like hacking)
+
+(think think think code)
