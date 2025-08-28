@@ -24,3 +24,6 @@ There should be no dependencies on anything but the dotnet sdk and the underlyin
 These two scripts are expected to be used as a dotnet project template for future programmers to use. They will provide the innards and actual functionality of app2 and app2-test instead of the defaul column reversal functionality. They should be able to use them either stand-alone or by simply referencing the shared library in their code. This means that this should be able to deploy as a script, app, monolith, microservice, and so on. As a future project template, we should never be tied to any one deployment pattern. Anyone familiar with using either F# or the cat or type utility in bash or dos should be able to use this code without any additional training or help
 
 (think think think code)
+
+// Gosh grok, when I type in my first test it doesn't work. I type in cat appsample.txt | ./app2 and I get app2.fsx(123,47): error FS3373: Invalid interpolated string. Single quote or verbatim string literals may not be used in interpolated expressions in single quote or verbatim strings. Consider using an explicit 'let' binding for the interpolation expression or use a triple quote string as the outer string literal.
+
