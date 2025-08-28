@@ -101,26 +101,30 @@ let printHelp (appName: string) : unit =
 /// Tests various data cases: empty lines, varying column counts, empty fields.
 let runInternalTests (processLine: string -> string -> string) (delim: string) (userLevel: LogLevel) (useDt: bool) : unit =
     logMsg userLevel useDt Info "Running internal smoke tests using pure functions."
+    let emptyLineTest = ("Empty line", "", "")
+    let oneColTest = ("One column", "field1", "field1")
+    let twoColTest = ("Two columns", "field1\tfield2", "field2\tfield1")
+    let skipColTest = ("Skipping columns (empty field)", "field1\t\tfield3", "field3\t\tfield1")
+    let sixFields = [|"1"; "2"; "3"; "4"; "5"; "6"|]
+    let sixInput = String.Join("\t", sixFields)
+    let sixExpected = String.Join("\t", Array.rev sixFields)
+    let sixTest = ("Six columns", sixInput, sixExpected)
+    let fifteenFields = Array.init 15 (fun i -> (i+1).ToString())
+    let fifteenInput = String.Join("\t", fifteenFields)
+    let fifteenExpected = String.Join("\t", Array.rev fifteenFields)
+    let fifteenTest = ("Fifteen columns", fifteenInput, fifteenExpected)
     let testCases : (string * string * string) list = [
-        ("Empty line", "", "");
-        ("One column", "field1", "field1");
-        ("Two columns", "field1\\tfield2", "field2\\tfield1");
-        ("Skipping columns (empty field)", "field1\\t\\tfield3", "field3\\t\\tfield1");
-        ("Six columns", 
-         let fields = [|"1"; "2"; "3"; "4"; "5"; "6"|]
-         let input = String.Join("\\t", fields)
-         let expected = String.Join("\\t", Array.rev fields)
-         (input, expected));
-        ("Fifteen columns", 
-         let fields = Array.init 15 (fun i -> (i+1).ToString())
-         let input = String.Join("\\t", fields)
-         let expected = String.Join("\\t", Array.rev fields)
-         (input, expected))
+        emptyLineTest
+        oneColTest
+        twoColTest
+        skipColTest
+        sixTest
+        fifteenTest
     ]
-    for (name, input, expected) in testCases do
-        let actual = processLine input delim
+    for (name, inputLine, expected) in testCases do
+        let actual = processLine inputLine delim
         let pass = actual = expected
-        let result = $"{name}: {(if pass then "PASS" else "FAIL")} - Expected: '{expected}', Actual: '{actual}'"
+        let result = sprintf "%s: %s - Expected: '%s', Actual: '%s'" name (if pass then "PASS" else "FAIL") expected actual
         Console.WriteLine result
         if not pass then
             logMsg userLevel useDt Warn $"Internal test failed: {name}"
@@ -183,8 +187,8 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
         logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
     finally
         if isFileOutput then
-            writer.Flush()
-            writer.Dispose()
+            (writer :?> StreamWriter).Flush()
+            (writer :?> StreamWriter).Dispose()
 
 /// Entry point.
 [<EntryPoint>]
