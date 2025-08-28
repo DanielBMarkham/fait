@@ -1,0 +1,5 @@
+#!/bin/bash
+# app2-test (BASH wrapper for app2-test.fsx)
+# Makes it executable like a Linux command: chmod +x app2-test
+
+exec dotnet fsi app2-test.fsx "$@"
