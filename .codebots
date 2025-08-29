@@ -43,3 +43,12 @@ but here has type
     'int'
 
 // I didn't get that second file you just stopped sending me code
+(fixed)
+// Dang grok, now when I run  cat appsample.txt | ./app2 I get app2.fsx(234,3): warning FS2304: Functions with [<EntryPoint>] are not invoked in FSI. 'main' was not invoked. Execute 'main <args>' in order to invoke 'main' with the appropriate string array of command line arguments.
+
+Also when I start checking the second script and run cat appsample.txt | ./app2-test I get that error I thought we had fixed, app2-test.fsx(161,13): error FS0193: Type constraint mismatch. The type
+    'TextWriter'
+is not compatible with type
+    'StreamWriter'
+
+You are making changes to both of these at once, aren't you? Since we haven't added any unique functionality, so far app2 and app2-test should look very similar (and have the same compilation or execution problems)
