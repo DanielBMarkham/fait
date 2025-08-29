@@ -52,3 +52,6 @@ is not compatible with type
     'StreamWriter'
 
 You are making changes to both of these at once, aren't you? Since we haven't added any unique functionality, so far app2 and app2-test should look very similar (and have the same compilation or execution problems)
+(think code)
+
+// Well, the two seem to run now, only with the warning app2-test.fsx(161,13): warning FS0066: This upcast is unnecessary - the types are identical. You don't need that upcast. Next up I try to run using the --tests option, but it says unknown option. I believe dotnet is capturing my command line parameters instead of sending them to app or app2. Perhaps we should use something like dotnet fsi app.fsx "$@" in our bash batch file instead of that exec. Then I can run my smoke tests from the command line like I wanted.
