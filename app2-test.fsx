@@ -1,6 +1,6 @@
-// app2-test.fsx
-// Main script for app2-test. Identical structure to app2.fsx for architectural similarity.
-// Uses processAppTestDataLine from the library (initially same as app2, but separate for future divergence).
+// app2.fsx
+// Main script for app2. Loads the shared library and handles CLI I/O, options, logging, and tests.
+// Designed to be as functional as possible while handling imperative I/O.
 
 #load "app2lib.fsx"
 
@@ -8,7 +8,7 @@ open System
 open System.IO
 open App2Lib
 
-let appName = "app2-test"
+let appName = "app2"
 
 /// Log levels for verbosity control.
 type LogLevel = 
@@ -89,13 +89,13 @@ let printHelp (appName: string) : unit =
     Console.WriteLine("")
     Console.WriteLine("Usage scenarios:")
     Console.WriteLine("Piping input/output (streams lines, reverses columns):")
-    Console.WriteLine("  BASH: cat appsample.txt | app2-test | app2-test > reversed_twice.txt  (should match original)")
-    Console.WriteLine("  DOS:  type appsample.txt | app2-test | app2-test > reversed_twice.txt  (should match original)")
+    Console.WriteLine("  BASH: cat appsample.txt | app2 | app2 > reversed_twice.txt  (should match original)")
+    Console.WriteLine("  DOS:  type appsample.txt | app2 | app2 > reversed_twice.txt  (should match original)")
     Console.WriteLine("File input/output:")
-    Console.WriteLine("  BASH/DOS: app2-test --input appsample.txt --output out.txt --d ','")
+    Console.WriteLine("  BASH/DOS: app2 --input appsample.txt --output out.txt --d ','")
     Console.WriteLine("Interactive input (type lines, end with Ctrl+D (BASH) or Ctrl+Z (DOS)):")
-    Console.WriteLine("  BASH/DOS: app2-test --d ' '")
-    Console.WriteLine("Multiple pipes (e.g., app2 | app2-test | app2 | app2-test works indefinitely, reversing columns each time).")
+    Console.WriteLine("  BASH/DOS: app2 --d ' '")
+    Console.WriteLine("Multiple pipes (e.g., app2 | app2-test | app2-test | app2 works indefinitely, reversing columns each time).")
 
 /// Runs internal smoke tests using the pure processing function from the library.
 /// Tests various data cases: empty lines, varying column counts, empty fields.
@@ -133,32 +133,32 @@ let runInternalTests (processLine: string -> string -> string) (delim: string) (
 let printExternalTests (appName: string) (userLevel: LogLevel) (useDt: bool) : unit =
     logMsg userLevel useDt Info "External OS smoke tests (run manually to verify behavior)."
     Console.WriteLine("1. Empty piped input (no output expected):")
-    Console.WriteLine("   BASH: echo | app2-test > out.txt ; if [ -s out.txt ]; then echo 'FAIL: produced output on empty input'; else echo 'PASS'; fi")
-    Console.WriteLine("   DOS:  echo. | app2-test > out.txt & if exist out.txt (for /f %%i in ('find /c /v \"\" out.txt') do if %%i gtr 0 (echo FAIL) else (echo PASS)) else (echo PASS)")
+    Console.WriteLine("   BASH: echo | app2 > out.txt ; if [ -s out.txt ]; then echo 'FAIL: produced output on empty input'; else echo 'PASS'; fi")
+    Console.WriteLine("   DOS:  echo. | app2 > out.txt & if exist out.txt (for /f %%i in ('find /c /v \"\" out.txt') do if %%i gtr 0 (echo FAIL) else (echo PASS)) else (echo PASS)")
     Console.WriteLine("2. Interactive input (type 'a\\tb', end session, expect 'b\\ta'):")
-    Console.WriteLine("   BASH/DOS: app2-test  (type line, Ctrl+D (BASH) or Ctrl+Z (DOS) to end)")
+    Console.WriteLine("   BASH/DOS: app2  (type line, Ctrl+D (BASH) or Ctrl+Z (DOS) to end)")
     Console.WriteLine("3. File input with empty file (no output expected):")
-    Console.WriteLine("   BASH/DOS: touch empty.txt ; app2-test --input empty.txt > out.txt ; (check out.txt empty)")
+    Console.WriteLine("   BASH/DOS: touch empty.txt ; app2 --input empty.txt > out.txt ; (check out.txt empty)")
     Console.WriteLine("4. Varying columns in file (use appsample.txt, verify reversed columns):")
-    Console.WriteLine("   BASH/DOS: app2-test --input appsample.txt --output out.txt  (manually verify reversal)")
+    Console.WriteLine("   BASH/DOS: app2 --input appsample.txt --output out.txt  (manually verify reversal)")
     Console.WriteLine("5. Piping multiple times (should reverse back to original after even count):")
-    Console.WriteLine("   BASH: cat appsample.txt | app2-test | app2-test > out.txt ; diff appsample.txt out.txt  (should match)")
-    Console.WriteLine("   DOS:  type appsample.txt | app2-test | app2-test > out.txt  (diff appsample.txt out.txt should match)")
+    Console.WriteLine("   BASH: cat appsample.txt | app2 | app2 > out.txt ; diff appsample.txt out.txt  (should match)")
+    Console.WriteLine("   DOS:  type appsample.txt | app2 | app2 > out.txt  (diff appsample.txt out.txt should match)")
     Console.WriteLine("6. Custom delimiter:")
-    Console.WriteLine("   BASH/DOS: echo 'a,b' | app2-test --d ','  (expect 'b,a')")
+    Console.WriteLine("   BASH/DOS: echo 'a,b' | app2 --d ','  (expect 'b,a')")
     Console.WriteLine("7. Help and options:")
-    Console.WriteLine("   BASH/DOS: app2-test --h  (should print help without processing)")
+    Console.WriteLine("   BASH/DOS: app2 --h  (should print help without processing)")
 
 /// Main processing logic: reads input (file or stdin), processes line-by-line, writes output (file or stdout).
 /// Streams data without loading entire input at once.
 let processInput (inputFile: string option) (outputFile: string option) (delim: string) (processLine: string -> string -> string) (userLevel: LogLevel) (useDt: bool) : unit =
     if userLevel = Info then logMsg userLevel useDt Info "Starting line-by-line processing."
-    let writer : TextWriter =
+    let writer =
         match outputFile with
         | Some file ->
             new StreamWriter(file) :> TextWriter
         | None ->
-            Console.Out :> TextWriter
+            Console.Out
     use outputWriter = writer
     if inputFile.IsSome then
         try
@@ -187,8 +187,7 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
             logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
     if userLevel = Info then logMsg userLevel useDt Info "Finished line-by-line processing."
 
-/// Entry point.
-let main argv =
+let main (argv: string[]) =
     try
         let args = argv
         let help, userLevel, inputFile, outputFile, delim, runTests, useDt = parseArgs args
@@ -196,11 +195,11 @@ let main argv =
             printHelp appName
             0
         elif runTests then
-            runInternalTests processAppTestDataLine delim userLevel useDt
+            runInternalTests processAppDataLine delim userLevel useDt
             printExternalTests appName userLevel useDt
             0
         else
-            processInput inputFile outputFile delim processAppTestDataLine userLevel useDt
+            processInput inputFile outputFile delim processAppDataLine userLevel useDt
             0
     with
     | ex ->
@@ -208,6 +207,4 @@ let main argv =
         Console.Error.WriteLine($"Top-level error: {ex.Message}")
         1
 
-#if INTERACTIVE
 System.Environment.Exit (main fsi.CommandLineArgs.[1..])
-#endif

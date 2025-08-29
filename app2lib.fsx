@@ -8,26 +8,24 @@ open System
 open System.Text.RegularExpressions
 
 /// Reverses the columns in a single line based on the delimiter regex pattern.
-/// Splits the line using the regex, reverses the columns while preserving the original delimiters.
-let private reverseColumnsLine (line: string) (delimPattern: string) : string =
-    if String.IsNullOrEmpty line then
-        ""
+/// Splits the line using the regex with capturing groups to preserve delimiters, reverses the columns, and joins back with reversed delimiters.
+let private reverseColumnsLine (line: string) (delim: string) : string =
+    if String.IsNullOrEmpty line then ""
     else
-        let regex = Regex($"^(.*?)((?:{delimPattern}(.*))*)$", RegexOptions.Singleline)
-        let m = regex.Match(line)
-        if not m.Success then
-            line  // If no match, return original
+        let pattern = "(" + delim + ")"
+        let regex = Regex(pattern)
+        let parts = regex.Split(line)
+        if parts.Length = 1 then line
         else
-            let columns = m.Groups.[1].Value :: (if m.Groups.[3].Captures.Count > 0 then [ for c in m.Groups.[3].Captures -> c.Value ] else [])
-            let delimsMatch = Regex(delimPattern)
-            let delims = delimsMatch.Matches(m.Groups.[2].Value) |> Seq.cast<Match> |> Seq.map (fun dm -> dm.Value) |> List.ofSeq
-            let revColumns = List.rev columns
-            let revDelims = if delims.Length > 0 then List.rev delims else []
+            let columns = [ for i in 0 .. 2 .. parts.Length - 1 -> parts.[i] ]
+            let delims = if parts.Length > 1 then [ for i in 1 .. 2 .. parts.Length - 2 -> parts.[i] ] else []
+            let rev_columns = List.rev columns
+            let rev_delims = List.rev delims
             let sb = System.Text.StringBuilder()
-            for i in 0..revColumns.Length - 1 do
-                sb.Append(revColumns.[i]) |> ignore
-                if i < revColumns.Length - 1 then
-                    sb.Append(revDelims.[i]) |> ignore
+            for i in 0 .. rev_columns.Length - 1 do
+                sb.Append(rev_columns.[i]) |> ignore
+                if i < rev_columns.Length - 1 then
+                    sb.Append(rev_delims.[i]) |> ignore
             sb.ToString()
 
 /// Pure function to process a single line for app2 (initially reverses columns).

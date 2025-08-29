@@ -153,12 +153,12 @@ let printExternalTests (appName: string) (userLevel: LogLevel) (useDt: bool) : u
 /// Streams data without loading entire input at once.
 let processInput (inputFile: string option) (outputFile: string option) (delim: string) (processLine: string -> string -> string) (userLevel: LogLevel) (useDt: bool) : unit =
     if userLevel = Info then logMsg userLevel useDt Info "Starting line-by-line processing."
-    let writer : TextWriter =
+    let writer =
         match outputFile with
         | Some file ->
             new StreamWriter(file) :> TextWriter
         | None ->
-            Console.Out :> TextWriter
+            Console.Out
     use outputWriter = writer
     if inputFile.IsSome then
         try
@@ -187,8 +187,7 @@ let processInput (inputFile: string option) (outputFile: string option) (delim: 
             logMsg userLevel useDt Error $"Unexpected error during processing: {ex.Message}"
     if userLevel = Info then logMsg userLevel useDt Info "Finished line-by-line processing."
 
-/// Entry point.
-let main argv =
+let main (argv: string[]) =
     try
         let args = argv
         let help, userLevel, inputFile, outputFile, delim, runTests, useDt = parseArgs args
@@ -208,6 +207,4 @@ let main argv =
         Console.Error.WriteLine($"Top-level error: {ex.Message}")
         1
 
-#if INTERACTIVE
 System.Environment.Exit (main fsi.CommandLineArgs.[1..])
-#endif
